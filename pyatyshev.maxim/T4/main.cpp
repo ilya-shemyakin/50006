@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <iomanip>
+#include <cerrno>
 
 int main()
 {
@@ -42,5 +43,6 @@ int main()
               << composite.getCenter().y << "), " << composite.getArea()
               << ": " << composite.getDetails() << "]" << std::endl;
 
-    return 0;
+    std::cerr << "Error: Invalid configuration" << std::endl;
+    return 2;
 }
