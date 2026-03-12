@@ -12,7 +12,7 @@ void CompositeShape::addShape(std::shared_ptr<Shape> shape)
 double CompositeShape::getArea() const
 {
     double totalArea = 0.0;
-    for (const auto& shape : shapes_)
+    for (const auto &shape : shapes_)
     {
         totalArea += shape->getArea();
     }
@@ -30,7 +30,7 @@ Point CompositeShape::getCenter() const
     double centerX = 0.0;
     double centerY = 0.0;
 
-    for (const auto& shape : shapes_)
+    for (const auto &shape : shapes_)
     {
         double area = shape->getArea();
         Point center = shape->getCenter();
@@ -45,7 +45,7 @@ Point CompositeShape::getCenter() const
 
 void CompositeShape::move(double dx, double dy)
 {
-    for (auto& shape : shapes_)
+    for (auto &shape : shapes_)
     {
         shape->move(dx, dy);
     }
@@ -53,7 +53,7 @@ void CompositeShape::move(double dx, double dy)
 
 void CompositeShape::scale(double factor)
 {
-    for (auto& shape : shapes_)
+    for (auto &shape : shapes_)
     {
         shape->scale(factor);
     }
