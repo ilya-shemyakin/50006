@@ -16,6 +16,10 @@ public:
     void move(double dx, double dy) override;
     void scale(double factor) override;
     std::string getName() const override;
+    double getLeft() const;
+    double getRight() const;
+    double getBottom() const;
+    double getTop() const;
 };
 
 #endif
