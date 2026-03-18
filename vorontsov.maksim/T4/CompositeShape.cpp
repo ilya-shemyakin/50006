@@ -1,6 +1,7 @@
 #include "Point.h"
 #include "CompositeShape.h"
 #include <cmath>
+#include <limits>
 
 
 CompositeShape::CompositeShape(): shapes(){

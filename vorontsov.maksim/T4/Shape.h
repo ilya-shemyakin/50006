@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHAPE_H
+#define SHAPE_H
 #include "Point.h"
 
 class Shape
@@ -11,3 +12,4 @@ public:
     virtual void scale(float multiplier)= 0;
     virtual const char* getName()const = 0;
 };
+#endif

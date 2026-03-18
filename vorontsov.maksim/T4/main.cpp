@@ -61,7 +61,7 @@ int main()
     composite->addShape(rhombus1);
     shapes.push_back(composite);
 
-    for(int i=0;i<shapes.size();++i)
+    for(size_t i = 0; i < shapes.size(); ++i)
     {
         std::cout <<"Shape #"<<i+1<< "\nbefore" << std::endl;
         printShape(shapes[i]);

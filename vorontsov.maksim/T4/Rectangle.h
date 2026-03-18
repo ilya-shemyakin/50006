@@ -1,4 +1,6 @@
-#pragma once
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
+
 #include "Point.h"
 #include "Shape.h"
 
@@ -21,3 +23,4 @@ private:
     Point bl;
     Point tr;
 };
+#endif

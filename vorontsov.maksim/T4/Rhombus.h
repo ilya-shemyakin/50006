@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RHOMBUS_H
+#define RHOMBUS_H
 #include "Point.h"
 #include"Shape.h"
 
@@ -21,3 +22,4 @@ public:
     float getDiagonalVertical()const {return diagonalVertical;}
     float getDiagonalHorizontal()const {return diagonalHorizontal;}
 };
+#endif

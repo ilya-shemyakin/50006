@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMPOSITE_SHAPE_H
+#define COMPOSITE_SHAPE_H
 #include "Point.h"
 #include "Shape.h"
 #include <vector>
@@ -22,4 +23,4 @@ public:
     size_t getShapesCount()const {return shapes.size();}
     std::shared_ptr<Shape> getShape(size_t index)const {return shapes[index];}
 };
-
+#endif
