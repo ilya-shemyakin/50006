@@ -8,11 +8,11 @@
 class CompositeShape : public Shape
 {
 private:
-    std::vector<std::shared_ptr<Shape>> shapes;
+    std::vector<std::unique_ptr<Shape>> shapes;
 
 public:
     CompositeShape();
-    void addShape(std::shared_ptr<Shape> shape);
+    void addShape(std::unique_ptr<Shape> shape);
 
     float getArea()const override;
     Point getCenter()const override;
@@ -21,6 +21,8 @@ public:
     const char* getName()const override;
 
     size_t getShapesCount()const {return shapes.size();}
-    std::shared_ptr<Shape> getShape(size_t index)const {return shapes[index];}
+
+    const Shape& getShape(size_t index) const;
+
 };
 #endif

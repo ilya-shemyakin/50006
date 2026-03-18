@@ -2,17 +2,22 @@
 #include "CompositeShape.h"
 #include <cmath>
 #include <limits>
+#include <stdexcept>
+#include <algorithm>
 
 
 CompositeShape::CompositeShape(): shapes(){
 }
 
-void CompositeShape::addShape(std::shared_ptr<Shape> shape){
-    shapes.push_back(shape);
+void CompositeShape::addShape(std::unique_ptr<Shape> shape){
+    if (!shape) {
+        throw std::invalid_argument("Cannot add null shape to composite");
+    }
+    shapes.push_back(std::move(shape));
 }
 
 float CompositeShape::getArea()const {
-    float totalArea = 0.0;
+    float totalArea = 0;
     for (const auto& shape : shapes){
         totalArea += shape->getArea();
     }
@@ -28,19 +33,15 @@ Point CompositeShape::getCenter()const {
     float minY = std::numeric_limits<float>::max();
     float maxX = std::numeric_limits<float>::lowest();
     float maxY = std::numeric_limits<float>::lowest();
-
-    for (const auto& shape : shapes){
+    for (const auto& shape : shapes)
+    {
         Point center = shape->getCenter();
-        float area = shape->getArea();
-        float size = std::sqrt(area);
-
-        minX = std::min(minX, center.x - size);
-        minY = std::min(minY, center.y - size);
-        maxX = std::max(maxX, center.x + size);
-        maxY = std::max(maxY, center.y + size);
+        minX = std::min(minX, center.x);
+        minY = std::min(minY, center.y);
+        maxX = std::max(maxX, center.x);
+        maxY = std::max(maxY, center.y);
     }
-
-    return Point((minX + maxX)/ 2.0, (minY + maxY)/ 2.0);
+    return Point((minX + maxX) / 2, (minY + maxY) / 2);
 }
 
 void CompositeShape::move(float dx, float dy){
@@ -61,6 +62,13 @@ void CompositeShape::scale(float coefficient){
         shape->move(dx, dy);
         shape->scale(coefficient);
     }
+}
+
+const Shape& CompositeShape::getShape(size_t index) const {
+    if (index >= shapes.size()) {
+        throw std::out_of_range("Index out of range in CompositeShape");
+    }
+    return *shapes[index];
 }
 
 const char* CompositeShape::getName()const {

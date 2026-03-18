@@ -9,24 +9,26 @@
 
 
 
-static void printShape(std::shared_ptr<Shape> shape){
+static void printShape(const Shape& shape){
+
     std::cout << std::fixed << std::setprecision(2);
 
-    if (shape->getName()== std::string("CompositeShape"))
+    if (shape.getName()== std::string("CompositeShape"))
     {
-        std::shared_ptr<CompositeShape> composite = std::dynamic_pointer_cast<CompositeShape>(shape);
-        Point center = composite->getCenter();
-        double area = composite->getArea();
+
+        const CompositeShape& composite = dynamic_cast<const CompositeShape&>(shape);
+        Point center = composite.getCenter();
+        float area = composite.getArea();
 
         std::cout << "[CompositeShape,(" << center.x << "," << center.y << "),"<< area << ":\n";
 
-        for (size_t i = 0; i < composite->getShapesCount(); ++i)
+        for (size_t i = 0; i < composite.getShapesCount(); ++i)
         {
-            std::shared_ptr<Shape> s = composite->getShape(i);
-            Point c = s->getCenter();
-            double a = s->getArea();
-            std::cout << " " << s->getName()<< ",(" << c.x << ", " << c.y<< ")," << a;
-            if (i < composite->getShapesCount()- 1)
+            const Shape & s  = composite.getShape(i);
+            Point c = s.getCenter();
+            float a = s.getArea();
+            std::cout << " " << s.getName()<< ",(" << c.x << ", " << c.y<< ")," << a;
+            if (i < composite.getShapesCount()- 1)
             {
                 std::cout << ",\n";
             }
@@ -35,39 +37,40 @@ static void printShape(std::shared_ptr<Shape> shape){
     }
     else
     {
-        Point center = shape->getCenter();
-        double area = shape->getArea();
-        std::cout << "[" << shape->getName()<< ",(" << center.x << ","<< center.y << ")," << area << "]" << std::endl;
+        Point center = shape.getCenter();
+        float area = shape.getArea();
+        std::cout << "[" << shape.getName()<< ",(" << center.x << ","<< center.y << ")," << area << "]" << std::endl;
     }
 }
 
 int main()
 {
-    std::vector<std::shared_ptr<Shape>> shapes;
-    auto rect1 = std::make_shared<Rectangle>(Point(0, 0), Point(4, 3));
-    shapes.push_back(rect1);
 
-    auto rect2 = std::make_shared<Rectangle>(Point(5, 5), Point(9, 8));
-    shapes.push_back(rect2);
+    std::vector<std::unique_ptr<Shape>> shapes;
+    auto rect1 = std::make_unique<Rectangle>(Point(0, 0), Point(4, 3));
+    shapes.push_back(std::move(rect1));
 
-    auto rhombus1 = std::make_shared<Rhombus>(Point(10, 10), 6, 8);
-    shapes.push_back(rhombus1);
+    auto rect2 = std::make_unique<Rectangle>(Point(5, 5), Point(9, 8));
+    shapes.push_back(std::move(rect2));
 
-    auto rhombus2 = std::make_shared<Rhombus>(Point(2, 8), 4, 5);
-    shapes.push_back(rhombus2);
+    auto rhombus1 = std::make_unique<Rhombus>(Point(10, 10), 6, 8);
+    shapes.push_back(std::move(rhombus1));
 
-    auto composite = std::make_shared<CompositeShape>();
-    composite->addShape(rect1);
-    composite->addShape(rhombus1);
-    shapes.push_back(composite);
+    auto rhombus2 = std::make_unique<Rhombus>(Point(2, 8), 4, 5);
+    shapes.push_back(std::move(rhombus2));
+
+    auto composite = std::make_unique<CompositeShape>();
+    composite->addShape(std::make_unique<Rectangle>(Point(0, 0), Point(4, 3)));
+    composite->addShape(std::make_unique<Rhombus>(Point(10, 10), 6, 8));
+    shapes.push_back((std::move(composite)));
 
     for(size_t i = 0; i < shapes.size(); ++i)
     {
         std::cout <<"Shape #"<<i+1<< "\nbefore" << std::endl;
-        printShape(shapes[i]);
+        printShape(*shapes[i]);
         shapes[i]->scale(2);
         std::cout << "\nafter scale" << std::endl;
-        printShape(shapes[i]);
+        printShape(*shapes[i]);
         std::cout << "\n";
     }
 }

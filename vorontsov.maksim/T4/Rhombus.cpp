@@ -1,12 +1,17 @@
 #include "Point.h"
 #include "Rhombus.h"
+#include <stdexcept>
 
-Rhombus::Rhombus(Point centerPoint, float diagV, float diagH)
-    : center(centerPoint), diagonalVertical(diagV), diagonalHorizontal(diagH){
+Rhombus::Rhombus(const Point& centerPoint, float diagV, float diagH)
+    : center(centerPoint), diagonalVertical(diagV), diagonalHorizontal(diagH)
+{
+    if (diagV <= 0 || diagH <= 0) {
+        throw std::invalid_argument("Rhombus diagonals must be positive");
+    }
 }
 
 float Rhombus::getArea()const {
-    return (diagonalVertical * diagonalHorizontal)/ 2.0;
+    return (diagonalVertical * diagonalHorizontal)/ 2;
 }
 
 Point Rhombus::getCenter()const {
