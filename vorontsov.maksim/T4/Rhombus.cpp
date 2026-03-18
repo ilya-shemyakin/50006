@@ -1,3 +1,4 @@
+#include "Point.h"
 #include "Rhombus.h"
 
 Rhombus::Rhombus(Point centerPoint, float diagV, float diagH)

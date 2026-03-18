@@ -1,3 +1,4 @@
+#include "Point.h"
 #include "Rectangle.h"
 
 Rectangle::Rectangle(Point bL, Point tR): bl(bL), tr(tR){}
