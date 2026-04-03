@@ -5,94 +5,78 @@
 
 void CompositeShape::addShape(std::unique_ptr<Shape> shape)
 {
-  if (!shape)
-  {
-    throw std::invalid_argument(
-      "CompositeShape cannot add null shape!!!");
-  }
-  shapes.push_back(std::move(shape));
+    if (!shape)
+        throw std::invalid_argument("Cannot add null shape");
+    shapes.push_back(std::move(shape));
 }
 
 double CompositeShape::getArea() const
 {
-  double totalArea = 0.0;
-  for (const std::unique_ptr<Shape> &shape : shapes)
-  {
-    totalArea += shape->getArea();
-  }
-  return totalArea;
+    double total = 0.0;
+    for (const auto& s : shapes)
+        total += s->getArea();
+    return total;
 }
 
 Point CompositeShape::getCenter() const
 {
-  if (shapes.empty())
-  {
-    return Point(0, 0);
-  }
+    if (shapes.empty())
+        return Point(0, 0);
 
-  double minX = std::numeric_limits<double>::max();
-  double minY = std::numeric_limits<double>::max();
-  double maxX = std::numeric_limits<double>::lowest();
-  double maxY = std::numeric_limits<double>::lowest();
-  for (const std::unique_ptr<Shape> &shape : shapes)
-  {
-    Point center = shape->getCenter();
-    minX = std::min(minX, center.x);
-    minY = std::min(minY, center.y);
-    maxX = std::max(maxX, center.x);
-    maxY = std::max(maxY, center.y);
-  }
-  return Point((minX + maxX) / 2.0, (minY + maxY) / 2.0);
+    double minX = std::numeric_limits<double>::max();
+    double minY = std::numeric_limits<double>::max();
+    double maxX = std::numeric_limits<double>::lowest();
+    double maxY = std::numeric_limits<double>::lowest();
+
+    for (const auto& s : shapes)
+    {
+        Point c = s->getCenter();
+        minX = std::min(minX, c.x);
+        minY = std::min(minY, c.y);
+        maxX = std::max(maxX, c.x);
+        maxY = std::max(maxY, c.y);
+    }
+
+    return Point((minX + maxX) / 2.0, (minY + maxY) / 2.0);
 }
 
 void CompositeShape::move(double dx, double dy)
 {
-  for (std::unique_ptr<Shape> &shape : shapes)
-  {
-    shape->move(dx, dy);
-  }
+    for (auto& s : shapes)
+        s->move(dx, dy);
 }
 
-void CompositeShape::scale(double kef)
+void CompositeShape::scale(double factor)
 {
-  if (kef <= 0)
-  {
-    throw std::invalid_argument("Scale kef must be positive!!!");
-  }
-  if (shapes.empty())
-  {
-    return;
-  }
+    if (factor <= 0)
+        throw std::invalid_argument("Scale factor must be positive");
 
-  Point CompositeCenter = getCenter();
+    if (shapes.empty())
+        return;
 
-  for (std::unique_ptr<Shape> &shape : shapes)
-  {
-    Point shapeCenter = shape->getCenter();
+    Point center = getCenter();
 
-    double dx = shapeCenter.x - CompositeCenter.x;
-    double dy = shapeCenter.y - CompositeCenter.y;
-
-    double newDx = dx * kef;
-    double newDy = dy * kef;
-
-    shape->move(newDx - dx, newDy - dy);
-    shape->scale(kef);
-  }
+    for (auto& s : shapes)
+    {
+        Point c = s->getCenter();
+        double dx = c.x - center.x;
+        double dy = c.y - center.y;
+        s->move(dx * factor - dx, dy * factor - dy);
+        s->scale(factor);
+    }
 }
 
 std::string CompositeShape::getName() const
 {
-  return "COMPOSITE";
+    return "COMPOSITE";
 }
 
 size_t CompositeShape::getSize() const
 {
-  return shapes.size();
+    return shapes.size();
 }
 
-const std::vector<std::unique_ptr<Shape>>&
-CompositeShape::getShapes() const
+const std::vector<std::unique_ptr<Shape>>& CompositeShape::getShapes() const
 {
-  return shapes;
+    return shapes;
 }
