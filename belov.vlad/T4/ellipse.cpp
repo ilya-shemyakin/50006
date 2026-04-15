@@ -6,7 +6,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-Ellipse::Ellipse(const Point& c, double rx, double ry): center(c), radiusX(rx), radiusY(ry) {
+Ellipse::Ellipse(const Point& c, double rx, double ry) : center(c), radiusX(rx), radiusY(ry) {
     if (rx <= 0 || ry <= 0) {
         throw std::invalid_argument("Ellipse radius must be positive");
     }
