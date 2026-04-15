@@ -35,7 +35,7 @@ bool parseSLLLit(const std::string& str, long long& value)
     std::string cleaned;
     for (char c : str)
         if (c != 'L' && c != 'l') cleaned += c;
-    
+
     if (cleaned.empty()) return false;
     try { value = std::stoll(cleaned); return true; }
     catch (...) { return false; }
@@ -45,16 +45,16 @@ bool parseRATLSP(const std::string& str, std::pair<long long, unsigned long long
 {
     size_t posN = str.find("(:N");
     if (posN == std::string::npos) return false;
-    
+
     size_t posD = str.find(":D", posN);
     if (posD == std::string::npos) return false;
-    
+
     size_t posEnd = str.find(":)", posD);
     if (posEnd == std::string::npos) return false;
-    
+
     size_t numStart = posN + 3;
     while (numStart < posD && std::isspace(str[numStart])) numStart++;
-    
+
     std::string numStr;
     while (numStart < posD && !std::isspace(str[numStart]) && str[numStart] != ':')
     {
@@ -62,10 +62,10 @@ bool parseRATLSP(const std::string& str, std::pair<long long, unsigned long long
             numStr += str[numStart];
         numStart++;
     }
-    
+
     size_t denStart = posD + 2;
     while (denStart < posEnd && std::isspace(str[denStart])) denStart++;
-    
+
     std::string denStr;
     while (denStart < posEnd && !std::isspace(str[denStart]) && str[denStart] != ':')
     {
@@ -73,9 +73,9 @@ bool parseRATLSP(const std::string& str, std::pair<long long, unsigned long long
             denStr += str[denStart];
         denStart++;
     }
-    
+
     if (numStr.empty() || denStr.empty()) return false;
-    
+
     try
     {
         long long num = std::stoll(numStr);
@@ -108,37 +108,37 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
         in.setstate(std::ios::failbit);
         return in;
     }
-    
+
     if (line.empty() || line[0] != '(' || line.back() != ')')
     {
         in.setstate(std::ios::failbit);
         return in;
     }
-    
+
     std::string content = line.substr(1, line.length() - 2);
-    
+
     bool key1Found = false, key2Found = false, key3Found = false;
     DataStruct temp;
-    
+
     size_t key1Pos = content.find("key1");
     if (key1Pos != std::string::npos)
     {
         size_t start = key1Pos + 4;
         while (start < content.length() && std::isspace(content[start])) start++;
-        
+
         size_t end = start;
         while (end < content.length() && content[end] != ':') end++;
-        
+
         std::string valueStr = content.substr(start, end - start);
         if (parseSLLLit(valueStr, temp.key1)) key1Found = true;
     }
-    
+
     size_t key3Pos = content.find("key3");
     if (key3Pos != std::string::npos)
     {
         size_t start = key3Pos + 4;
         while (start < content.length() && std::isspace(content[start])) start++;
-        
+
         if (content[start] == '"')
         {
             size_t end = start + 1;
@@ -150,13 +150,13 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
             }
         }
     }
-    
+
     size_t key2Pos = content.find("key2");
     if (key2Pos != std::string::npos)
     {
         size_t start = key2Pos + 4;
         while (start < content.length() && std::isspace(content[start])) start++;
-        
+
         if (start < content.length() && content[start] == '(')
         {
             size_t end = start;
@@ -168,18 +168,18 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
                 if (parenCount == 0 && content[end] == ':' && end > start) break;
                 end++;
             }
-            
+
             std::string valueStr = content.substr(start, end - start);
             if (parseRATLSP(valueStr, temp.key2)) key2Found = true;
         }
     }
-    
+
     if (key1Found && key2Found && key3Found)
     {
         ds = temp;
         return in;
     }
-    
+
     in.setstate(std::ios::failbit);
     return in;
 }
@@ -210,14 +210,14 @@ std::ostream& operator<<(std::ostream& os, const DataStruct& ds)
 int main()
 {
     std::vector<DataStruct> data;
-    
+
     std::istream_iterator<DataStruct> iter(std::cin), end;
     std::copy(iter, end, std::back_inserter(data));
-    
+
     std::sort(data.begin(), data.end(), compareDataStruct);
-    
+
     std::ostream_iterator<DataStruct> out_iter(std::cout, "\n");
     std::copy(data.begin(), data.end(), out_iter);
-    
+
     return 0;
 }
