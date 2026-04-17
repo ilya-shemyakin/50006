@@ -1,4 +1,6 @@
-#pragma once
+#indef COMPOSITESHAPE.H
+#defibe COMPOSITESHAPE.H
+
 #include "shape.h"
 #include <vector>
 #include <memory>
@@ -18,4 +20,6 @@ public:
     void scale(double factor) override;
     std::string getName() const override;
 };
+
+#endif
 

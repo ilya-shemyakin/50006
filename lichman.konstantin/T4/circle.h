@@ -1,4 +1,6 @@
-#pragma once
+#indef CIRCLE.H
+#define CIRCLE.H
+
 #include "shape.h"
 
 class Circle : public Shape {
@@ -15,3 +17,5 @@ public:
     void scale(double factor) override;
     std::string getName() const override;
 };
+
+#endif

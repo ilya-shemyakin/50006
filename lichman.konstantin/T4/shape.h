@@ -1,4 +1,6 @@
-#pragma once
+#indef SHAPE.H
+#define SHAPE.H
+
 #include <string>
 #include "point.h"
 
@@ -12,4 +14,6 @@ public:
     virtual void scale(double k) = 0;
     virtual std::string getName() const = 0;
 };
+
+#endif
 

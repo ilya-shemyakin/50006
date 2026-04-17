@@ -1,4 +1,6 @@
-#pragma once
+#indef RECTANGLE.H
+#indef RECTANGLE.H
+
 #include "shape.h"
 
 class Rectangle : public Shape
@@ -15,4 +17,6 @@ public:
     void scale(double k) override;
     std::string getName() const override;
 };
+
+#endif
 
