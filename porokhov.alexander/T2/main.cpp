@@ -109,15 +109,17 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
         return in;
     }
 
-    if (line.empty() || line[0] != '(' || line.back() != ')')
-    {
-        in.setstate(std::ios::failbit);
+    if (line.empty())
         return in;
-    }
+
+    if (line[0] != '(' || line.back() != ')')
+        return in;
 
     std::string content = line.substr(1, line.length() - 2);
 
-    bool key1Found = false, key2Found = false, key3Found = false;
+    bool key1Ok = false;
+    bool key2Ok = false;
+    bool key3Ok = false;
     DataStruct temp;
 
     size_t key1Pos = content.find("key1");
@@ -129,8 +131,8 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
         size_t end = start;
         while (end < content.length() && content[end] != ':') end++;
 
-        std::string valueStr = content.substr(start, end - start);
-        if (parseSLLLit(valueStr, temp.key1)) key1Found = true;
+        std::string raw = content.substr(start, end - start);
+        if (parseSLLLit(raw, temp.key1)) key1Ok = true;
     }
 
     size_t key3Pos = content.find("key3");
@@ -143,10 +145,11 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
         {
             size_t end = start + 1;
             while (end < content.length() && content[end] != '"') end++;
+
             if (end < content.length())
             {
-                std::string valueStr = content.substr(start, end - start + 1);
-                if (parseQuotedString(valueStr, temp.key3)) key3Found = true;
+                std::string raw = content.substr(start, end - start + 1);
+                if (parseQuotedString(raw, temp.key3)) key3Ok = true;
             }
         }
     }
@@ -169,18 +172,17 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
                 end++;
             }
 
-            std::string valueStr = content.substr(start, end - start);
-            if (parseRATLSP(valueStr, temp.key2)) key2Found = true;
+            std::string raw = content.substr(start, end - start);
+            if (parseRATLSP(raw, temp.key2)) key2Ok = true;
         }
     }
 
-    if (key1Found && key2Found && key3Found)
+    if (key1Ok && key2Ok && key3Ok)
     {
         ds = temp;
         return in;
     }
 
-    in.setstate(std::ios::failbit);
     return in;
 }
 
