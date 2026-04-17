@@ -122,6 +122,10 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
     bool key3Ok = false;
     DataStruct temp;
 
+    temp.key1 = 0;
+    temp.key2 = {0, 1};
+    temp.key3 = "";
+
     size_t key1Pos = content.find("key1");
     if (key1Pos != std::string::npos)
     {
