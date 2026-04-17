@@ -1,4 +1,4 @@
-#indef SHAPE.H
+#ifndef SHAPE.H
 #define SHAPE.H
 
 #include <string>

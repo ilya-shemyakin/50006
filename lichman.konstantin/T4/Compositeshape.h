@@ -1,4 +1,4 @@
-#indef COMPOSITESHAPE.H
+#ifndef COMPOSITESHAPE.H
 #defibe COMPOSITESHAPE.H
 
 #include "shape.h"

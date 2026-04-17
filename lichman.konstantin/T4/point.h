@@ -1,4 +1,4 @@
-#indef POINT.H
+#ifndef POINT.H
 #define POINT.H
 
 struct Point

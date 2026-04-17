@@ -1,4 +1,4 @@
-#indef RECTANGLE.H
+#ifndef RECTANGLE.H
 #indef RECTANGLE.H
 
 #include "shape.h"
