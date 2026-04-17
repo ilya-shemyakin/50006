@@ -1,5 +1,5 @@
-#ifndef SHAPE.H
-#define SHAPE.H
+#ifndef SHAPE_H
+#define SHAPE_H
 
 #include <string>
 #include "point.h"

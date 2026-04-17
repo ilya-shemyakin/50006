@@ -1,5 +1,5 @@
-#ifndef COMPOSITESHAPE.H
-#defibe COMPOSITESHAPE.H
+#ifndef COMPOSITESHAPE_H
+#define COMPOSITESHAPE_H
 
 #include "shape.h"
 #include <vector>
