@@ -8,20 +8,19 @@
 class Rectangle : public Shape
 {
 public:
-	Rectangle(const Point& bottomLeft, const Point& topRight);
+    Rectangle(const Point& bottomLeft, const Point& topRight);
 
-	double getArea() const override;
-	Point getCenter() const override;
-	void move(double dx, double dy) override;
-	void scale(double factor) override;
-	std::string getName() const override;
+    double getArea() const override;
+    Point getCenter() const override;
+    void move(double dx, double dy) override;
+    void scale(double factor) override;
+    std::string getName() const override;
 
-	Point getBottomLeft() const;
-	Point getTopRight() const;
+    Point getBottomLeft() const;
+    Point getTopRight() const;
 
 private:
-	Point bottomLeft_;
-	Point topRight_;
+    Point bottomLeft_;
+    Point topRight_;
 };
-
 #endif
