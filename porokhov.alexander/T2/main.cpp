@@ -1,225 +1,197 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <string>
-#include <cctype>
-#include <cmath>
+#include <algorithm>
 #include <iterator>
 #include <sstream>
+#include <iomanip>
+#include <cctype>
 
 struct DataStruct
 {
-    long long key1;
-    std::pair<long long, unsigned long long> key2;
+    double key1;
+    unsigned long long key2;
     std::string key3;
 };
 
-double rationalMagnitude(const std::pair<long long, unsigned long long>& rat)
+class iofmtguard
 {
-    double numerator = static_cast<double>(rat.first);
-    double denominator = static_cast<double>(rat.second);
-    return std::sqrt(numerator * numerator + denominator * denominator);
-}
-
-bool compareDataStruct(const DataStruct& a, const DataStruct& b)
-{
-    if (a.key1 != b.key1) return a.key1 < b.key1;
-    double magA = rationalMagnitude(a.key2);
-    double magB = rationalMagnitude(b.key2);
-    if (std::abs(magA - magB) > 1e-10) return magA < magB;
-    return a.key3.length() < b.key3.length();
-}
-
-bool parseSLLLit(const std::string& str, long long& value)
-{
-    std::string cleaned;
-    for (char c : str)
-        if (c != 'L' && c != 'l') cleaned += c;
-
-    if (cleaned.empty()) return false;
-    try { value = std::stoll(cleaned); return true; }
-    catch (...) { return false; }
-}
-
-bool parseRATLSP(const std::string& str, std::pair<long long, unsigned long long>& value)
-{
-    size_t posN = str.find("(:N");
-    if (posN == std::string::npos) return false;
-
-    size_t posD = str.find(":D", posN);
-    if (posD == std::string::npos) return false;
-
-    size_t posEnd = str.find(":)", posD);
-    if (posEnd == std::string::npos) return false;
-
-    size_t numStart = posN + 3;
-    while (numStart < posD && std::isspace(str[numStart])) numStart++;
-
-    std::string numStr;
-    while (numStart < posD && !std::isspace(str[numStart]) && str[numStart] != ':')
+public:
+    explicit iofmtguard(std::basic_ios<char>& s) :
+        s_(s),
+        width_(s.width()),
+        precision_(s.precision()),
+        fill_(s.fill()),
+        fmt_(s.flags())
     {
-        if (str[numStart] != 'L' && str[numStart] != 'l')
-            numStr += str[numStart];
-        numStart++;
     }
 
-    size_t denStart = posD + 2;
-    while (denStart < posEnd && std::isspace(str[denStart])) denStart++;
-
-    std::string denStr;
-    while (denStart < posEnd && !std::isspace(str[denStart]) && str[denStart] != ':')
+    ~iofmtguard()
     {
-        if (str[denStart] != 'L' && str[denStart] != 'l')
-            denStr += str[denStart];
-        denStart++;
+        s_.width(width_);
+        s_.fill(fill_);
+        s_.precision(precision_);
+        s_.flags(fmt_);
     }
 
-    if (numStr.empty() || denStr.empty()) return false;
+private:
+    std::basic_ios<char>& s_;
+    std::streamsize width_;
+    std::streamsize precision_;
+    char fill_;
+    std::basic_ios<char>::fmtflags fmt_;
+};
 
-    try
-    {
-        long long num = std::stoll(numStr);
-        unsigned long long den = std::stoull(denStr);
-        if (den == 0) return false;
-        value = {num, den};
-        return true;
-    }
-    catch (...)
-    {
-        return false;
-    }
-}
-
-bool parseQuotedString(const std::string& str, std::string& value)
+std::istream& operator>>(std::istream& in, DataStruct& dest)
 {
-    size_t firstQuote = str.find('"');
-    if (firstQuote == std::string::npos) return false;
-    size_t lastQuote = str.rfind('"');
-    if (lastQuote == std::string::npos || lastQuote == firstQuote) return false;
-    value = str.substr(firstQuote + 1, lastQuote - firstQuote - 1);
-    return true;
-}
+    std::istream::sentry sentry(in);
+    if (!sentry)
+    {
+        return in;
+    }
 
-std::istream& operator>>(std::istream& in, DataStruct& ds)
-{
     std::string line;
-    if (!std::getline(in, line))
+    while (std::getline(in, line))
     {
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    if (line.empty())
-        return in;
-
-    if (line[0] != '(' || line.back() != ')')
-        return in;
-
-    std::string content = line.substr(1, line.length() - 2);
-
-    bool key1Ok = false;
-    bool key2Ok = false;
-    bool key3Ok = false;
-    DataStruct temp;
-
-    size_t key1Pos = content.find("key1");
-    if (key1Pos != std::string::npos)
-    {
-        size_t start = key1Pos + 4;
-        while (start < content.length() && std::isspace(content[start])) start++;
-
-        size_t end = start;
-        while (end < content.length() && content[end] != ':') end++;
-
-        std::string raw = content.substr(start, end - start);
-        if (parseSLLLit(raw, temp.key1)) key1Ok = true;
-    }
-
-    size_t key3Pos = content.find("key3");
-    if (key3Pos != std::string::npos)
-    {
-        size_t start = key3Pos + 4;
-        while (start < content.length() && std::isspace(content[start])) start++;
-
-        if (content[start] == '"')
+        if (!line.empty() && line.back() == '\r')
         {
-            size_t end = start + 1;
-            while (end < content.length() && content[end] != '"') end++;
+            line.pop_back();
+        }
 
-            if (end < content.length())
+        if (line.size() < 10 || line.front() != '(' || line.back() != ')')
+        {
+            continue;
+        }
+
+        std::istringstream iss(line);
+
+        char ch;
+        if (!(iss >> ch) || ch != '(')
+        {
+            continue;
+        }
+
+        DataStruct tmp{};
+        bool has_key1 = false;
+        bool has_key2 = false;
+        bool has_key3 = false;
+
+        while (true)
+        {
+            std::string label;
+            if (!(iss >> label))
             {
-                std::string raw = content.substr(start, end - start + 1);
-                if (parseQuotedString(raw, temp.key3)) key3Ok = true;
+                break;
             }
+
+            if (label == ":)")
+            {
+                break;
+            }
+
+            if (label == ":key1")
+            {
+                double val = 0.0;
+                char d = ' ';
+                if (iss >> val >> d)
+                {
+                    if (std::tolower(static_cast<unsigned char>(d)) == 'd')
+                    {
+                        tmp.key1 = val;
+                        has_key1 = true;
+                    }
+                }
+            }
+            else if (label == ":key2")
+            {
+                unsigned long long val = 0;
+                char u = ' ', l1 = ' ', l2 = ' ';
+                if (iss >> val >> u >> l1 >> l2)
+                {
+                    if (std::tolower(static_cast<unsigned char>(u)) == 'u' &&
+                        std::tolower(static_cast<unsigned char>(l1)) == 'l' &&
+                        std::tolower(static_cast<unsigned char>(l2)) == 'l')
+                    {
+                        tmp.key2 = val;
+                        has_key2 = true;
+                    }
+                }
+            }
+            else if (label == ":key3")
+            {
+                char quote = ' ';
+                if (iss >> quote && quote == '"')
+                {
+                    std::string val;
+                    if (std::getline(iss, val, '"'))
+                    {
+                        tmp.key3 = val;
+                        has_key3 = true;
+                    }
+                }
+            }
+        }
+
+        if (has_key1 && has_key2 && has_key3)
+        {
+            dest = tmp;
+            return in;
         }
     }
 
-    size_t key2Pos = content.find("key2");
-    if (key2Pos != std::string::npos)
-    {
-        size_t start = key2Pos + 4;
-        while (start < content.length() && std::isspace(content[start])) start++;
-
-        if (start < content.length() && content[start] == '(')
-        {
-            size_t end = start;
-            int parenCount = 0;
-            while (end < content.length())
-            {
-                if (content[end] == '(') parenCount++;
-                if (content[end] == ')') parenCount--;
-                if (parenCount == 0 && content[end] == ':' && end > start) break;
-                end++;
-            }
-
-            std::string raw = content.substr(start, end - start);
-            if (parseRATLSP(raw, temp.key2)) key2Ok = true;
-        }
-    }
-
-    if (key1Ok && key2Ok && key3Ok)
-    {
-        ds = temp;
-        return in;
-    }
-
+    in.setstate(std::ios::failbit);
     return in;
 }
 
-std::string formatSLLLit(long long value)
+std::ostream& operator<<(std::ostream& out, const DataStruct& src)
 {
-    return std::to_string(value);
-}
+    std::ostream::sentry sentry(out);
+    if (!sentry)
+    {
+        return out;
+    }
 
-std::string formatRATLSP(const std::pair<long long, unsigned long long>& value)
-{
-    return "(:N " + std::to_string(value.first) + ":D " + std::to_string(value.second) + ":)";
+    iofmtguard fmtguard(out);
+    out << "(:key1 ";
+    out << std::fixed;
+    out << std::setprecision(1);
+    out << src.key1;
+    out << "d:key2 ";
+    out << src.key2;
+    out << "ull:key3 \"";
+    out << src.key3;
+    out << "\":)";
+    return out;
 }
-
-std::string formatQuotedString(const std::string& value)
+bool compareDataStruct(const DataStruct& a, const DataStruct& b)
 {
-    return "\"" + value + "\"";
-}
-
-std::ostream& operator<<(std::ostream& os, const DataStruct& ds)
-{
-    os << "(:key1 " << formatSLLLit(ds.key1)
-       << ":key2 " << formatRATLSP(ds.key2)
-       << ":key3 " << formatQuotedString(ds.key3) << ":)";
-    return os;
+    if (a.key1 != b.key1)
+    {
+        return a.key1 < b.key1;
+    }
+    if (a.key2 != b.key2)
+    {
+        return a.key2 < b.key2;
+    }
+    return a.key3.length() < b.key3.length();
 }
 
 int main()
 {
-    std::vector<DataStruct> data;
+    std::vector<DataStruct> vec;
+    std::copy(
+        std::istream_iterator<DataStruct>(std::cin),
+        std::istream_iterator<DataStruct>(),
+        std::back_inserter(vec)
+    );
 
-    std::istream_iterator<DataStruct> iter(std::cin), end;
-    std::copy(iter, end, std::back_inserter(data));
+    std::sort(vec.begin(), vec.end(), compareDataStruct);
 
-    std::sort(data.begin(), data.end(), compareDataStruct);
-
-    std::ostream_iterator<DataStruct> out_iter(std::cout, "\n");
-    std::copy(data.begin(), data.end(), out_iter);
+    std::copy(
+        vec.begin(),
+        vec.end(),
+        std::ostream_iterator<DataStruct>(std::cout, "\n")
+    );
 
     return 0;
 }
