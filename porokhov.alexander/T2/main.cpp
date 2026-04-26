@@ -53,7 +53,51 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     std::string line;
     while (std::getline(in, line))
     {
+<<<<<<< HEAD
         if (!line.empty() && line.back() == '\r')
+=======
+        in.setstate(std::ios::failbit);
+        return in;
+    }
+
+    if (line.empty())
+        return in;
+
+    if (line[0] != '(' || line.back() != ')')
+        return in;
+
+    std::string content = line.substr(1, line.length() - 2);
+
+    bool key1Ok = false;
+    bool key2Ok = false;
+    bool key3Ok = false;
+    DataStruct temp;
+
+    temp.key1 = 0;
+    temp.key2 = {0, 1};
+    temp.key3 = "";
+
+    size_t key1Pos = content.find("key1");
+    if (key1Pos != std::string::npos)
+    {
+        size_t start = key1Pos + 4;
+        while (start < content.length() && std::isspace(content[start])) start++;
+
+        size_t end = start;
+        while (end < content.length() && content[end] != ':') end++;
+
+        std::string raw = content.substr(start, end - start);
+        if (parseSLLLit(raw, temp.key1)) key1Ok = true;
+    }
+
+    size_t key3Pos = content.find("key3");
+    if (key3Pos != std::string::npos)
+    {
+        size_t start = key3Pos + 4;
+        while (start < content.length() && std::isspace(content[start])) start++;
+
+        if (content[start] == '"')
+>>>>>>> 10459588512dfab46645b2cd75647a8189373ace
         {
             line.pop_back();
         }
