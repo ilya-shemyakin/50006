@@ -105,13 +105,12 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             else if (label == ":key2")
             {
                 unsigned long long val = 0;
-                std::string suffix;
-                if (iss >> val >> suffix)
+                char u = ' ', l1 = ' ', l2 = ' ';
+                if (iss >> val >> u >> l1 >> l2)
                 {
-                    if (suffix.size() >= 3 &&
-                        std::tolower(static_cast<unsigned char>(suffix[0])) == 'u' &&
-                        std::tolower(static_cast<unsigned char>(suffix[1])) == 'l' &&
-                        std::tolower(static_cast<unsigned char>(suffix[2])) == 'l')
+                    if (std::tolower(static_cast<unsigned char>(u)) == 'u' &&
+                        std::tolower(static_cast<unsigned char>(l1)) == 'l' &&
+                        std::tolower(static_cast<unsigned char>(l2)) == 'l')
                     {
                         tmp.key2 = val;
                         has_key2 = true;
@@ -164,7 +163,6 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     out << "\":)";
     return out;
 }
-
 bool compareDataStruct(const DataStruct& a, const DataStruct& b)
 {
     if (a.key1 != b.key1)
