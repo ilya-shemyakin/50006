@@ -53,51 +53,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
     std::string line;
     while (std::getline(in, line))
     {
-<<<<<<< HEAD
         if (!line.empty() && line.back() == '\r')
-=======
-        in.setstate(std::ios::failbit);
-        return in;
-    }
-
-    if (line.empty())
-        return in;
-
-    if (line[0] != '(' || line.back() != ')')
-        return in;
-
-    std::string content = line.substr(1, line.length() - 2);
-
-    bool key1Ok = false;
-    bool key2Ok = false;
-    bool key3Ok = false;
-    DataStruct temp;
-
-    temp.key1 = 0;
-    temp.key2 = {0, 1};
-    temp.key3 = "";
-
-    size_t key1Pos = content.find("key1");
-    if (key1Pos != std::string::npos)
-    {
-        size_t start = key1Pos + 4;
-        while (start < content.length() && std::isspace(content[start])) start++;
-
-        size_t end = start;
-        while (end < content.length() && content[end] != ':') end++;
-
-        std::string raw = content.substr(start, end - start);
-        if (parseSLLLit(raw, temp.key1)) key1Ok = true;
-    }
-
-    size_t key3Pos = content.find("key3");
-    if (key3Pos != std::string::npos)
-    {
-        size_t start = key3Pos + 4;
-        while (start < content.length() && std::isspace(content[start])) start++;
-
-        if (content[start] == '"')
->>>>>>> 10459588512dfab46645b2cd75647a8189373ace
         {
             line.pop_back();
         }
@@ -149,12 +105,13 @@ std::istream& operator>>(std::istream& in, DataStruct& dest)
             else if (label == ":key2")
             {
                 unsigned long long val = 0;
-                char u = ' ', l1 = ' ', l2 = ' ';
-                if (iss >> val >> u >> l1 >> l2)
+                std::string suffix;
+                if (iss >> val >> suffix)
                 {
-                    if (std::tolower(static_cast<unsigned char>(u)) == 'u' &&
-                        std::tolower(static_cast<unsigned char>(l1)) == 'l' &&
-                        std::tolower(static_cast<unsigned char>(l2)) == 'l')
+                    if (suffix.size() >= 3 &&
+                        std::tolower(static_cast<unsigned char>(suffix[0])) == 'u' &&
+                        std::tolower(static_cast<unsigned char>(suffix[1])) == 'l' &&
+                        std::tolower(static_cast<unsigned char>(suffix[2])) == 'l')
                     {
                         tmp.key2 = val;
                         has_key2 = true;
@@ -207,6 +164,7 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& src)
     out << "\":)";
     return out;
 }
+
 bool compareDataStruct(const DataStruct& a, const DataStruct& b)
 {
     if (a.key1 != b.key1)
