@@ -1,5 +1,6 @@
 #include "DataStruct.hpp"
 #include <sstream>
+
 #include <cctype>
 
 #include <iomanip>
@@ -13,11 +14,11 @@ static std::string trim(const std::string& str)
     return str.substr(start, end - start + 1);
 }
 
-static bool isNumber(const std::string& str)
+static bool isDecimalNumber(const std::string& str)
 {
     if (str.empty()) return false;
     for (char c : str) {
-        if (!std::isdigit(c)) return false;
+        if (!std::isdigit(static_cast<unsigned char>(c))) return false;
     }
     return true;
 }
@@ -44,7 +45,6 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
     bool hasKey2 = false;
     bool hasKey3 = false;
 
-    std::string key1Str, key2Str, key3Str;
 
     size_t pos = 0;
     while (pos < content.length()) {
@@ -61,46 +61,60 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
         size_t spacePos = part.find(' ');
         if (spacePos != std::string::npos) {
             std::string name = part.substr(0, spacePos);
-            std::string value = part.substr(spacePos + 1);
-            value = trim(value);
+            std::string value = trim(part.substr(spacePos + 1));
 
             if (name == "key1") {
-                key1Str = value;
-                if (value.length() > 1 && (value.back() == 'd' || value.back() == 'D')) {
+                if (value.length() > 2 &&
+                   (value.back() == 'd' || value.back() == 'D')) {
                     std::string numStr = value.substr(0, value.length() - 1);
-                    std::istringstream iss(numStr);
-                    double val;
-                    iss >> val;
-                    if (!iss.fail()) {
-                        data.key1 = val;
-                        hasKey1 = true;
+                    size_t dotPos = numStr.find('.');
+
+                    if (dotPos != std::string::npos &&
+                        dotPos > 0 &&
+                        dotPos < numStr.length() - 1) {
+
+                        bool valid = true;
+                        for (size_t i = 0; i < numStr.length(); ++i) {
+                            if (i == dotPos) continue;
+                            if (!std::isdigit(static_cast<unsigned char>(numStr[i]))) {
+                                valid = false;
+                                break;
+                            }
+                        }
+
+                        if (valid) {
+                            try {
+                                size_t idx = 0;
+                                data.key1 = std::stod(numStr, &idx);
+                                if (idx == numStr.length()) {
+                                    hasKey1 = true;
+                                }
+                            } catch (...) {}
+                        }
                     }
                 }
             }
             else if (name == "key2") {
-                key2Str = value;
-                std::string numStr = value;
-
-                if (value.length() >= 3 && (value.substr(value.length() - 3) == "ULL" || value.substr(value.length() - 3) == "ull")) {
-                    numStr = value.substr(0, value.length() - 3);
-                }
-                else if (value.length() >= 2 && (value.back() == 'u' || value.back() == 'U')) {
-                    numStr = value.substr(0, value.length() - 1);
-                }
-
-                if (isNumber(numStr)) {
-                    std::istringstream iss(numStr);
-                    unsigned long long val;
-                    iss >> val;
-                    if (!iss.fail()) {
-                        data.key2 = val;
-                        hasKey2 = true;
+                if (value.length() >= 4) {
+                    std::string suffix = value.substr(value.length() - 3);
+                    if (suffix == "ull" || suffix == "ULL") {
+                        std::string numStr = value.substr(0, value.length() - 3);
+                        if (isDecimalNumber(numStr)) {
+                            try {
+                                size_t idx = 0;
+                                data.key2 = std::stoull(numStr, &idx);
+                                if (idx == numStr.length()) {
+                                    hasKey2 = true;
+                                }
+                            } catch (...) {}
+                        }
                     }
                 }
             }
             else if (name == "key3") {
-                key3Str = value;
-                if (value.length() >= 2 && value.front() == '"' && value.back() == '"') {
+                if (value.length() >= 2 &&
+                    value.front() == '"' &&
+                    value.back() == '"') {
                     data.key3 = value.substr(1, value.length() - 2);
                     hasKey3 = true;
                 }
@@ -122,18 +136,15 @@ static std::string formatDouble(double value)
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(1);
     oss << value;
-    std::string result = oss.str();
-    if (result.find('.') == std::string::npos) {
-        result += ".0";
-    }
-    return result;
+    return oss.str();
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& data)
 {
     out << "(:key1 " << formatDouble(data.key1) << "d"
-        << ":key2 " << data.key2 << "u"
+        << ":key2 " << data.key2 << "ull"
         << ":key3 \"" << data.key3 << "\":)";
     return out;
 }
+
 
