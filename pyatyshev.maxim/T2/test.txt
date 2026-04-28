@@ -1,3 +1,0 @@
-(:key1 10.5d:key2 42u:key3 "hello":)
-(:key1 20.0D:key2 100ULL:key3 "world":)
-(:key1 10.5d:key2 30U:key3 "a":)
