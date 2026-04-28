@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <cmath>
 
 int main()
 {
@@ -14,7 +15,8 @@ int main()
 
     std::sort(data.begin(), data.end(),
         [](const DataStruct& lhs, const DataStruct& rhs) {
-            if (std::fabs(lhs.key1 - rhs.key1) > 1e-9) {
+
+            if (std::abs(lhs.key1 - rhs.key1) > 1e-9) {
                 return lhs.key1 < rhs.key1;
             }
             if (lhs.key2 != rhs.key2) {
