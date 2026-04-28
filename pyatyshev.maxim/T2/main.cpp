@@ -7,6 +7,7 @@
 
 int main()
 {
+
     std::vector<DataStruct> data;
 
     std::copy(std::istream_iterator<DataStruct>(std::cin),
@@ -29,3 +30,4 @@ int main()
 
     return 0;
 }
+
