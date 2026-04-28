@@ -15,7 +15,7 @@ int main()
 
     std::sort(data.begin(), data.end(),
         [](const DataStruct& lhs, const DataStruct& rhs) {
-            if (fabs(lhs.key1 - rhs.key1) > 1e-9) {
+            if (std::abs(lhs.key1 - rhs.key1) > 1e-9) {
                 return lhs.key1 < rhs.key1;
             }
             if (lhs.key2 != rhs.key2) {
@@ -28,10 +28,4 @@ int main()
               std::ostream_iterator<DataStruct>(std::cout, "\n"));
 
     return 0;
-
 }
-
-
-
-
-
