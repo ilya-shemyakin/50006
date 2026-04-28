@@ -4,7 +4,7 @@
 #include <cctype>
 
 #include <iomanip>
-#include <cmath>
+
 
 static std::string trim(const std::string& str)
 {
@@ -48,80 +48,86 @@ std::istream& operator>>(std::istream& in, DataStruct& data)
 
     size_t pos = 0;
     while (pos < content.length()) {
-        size_t colonPos = content.find(':', pos);
-        if (colonPos == std::string::npos) break;
-
-        size_t nextColon = content.find(':', colonPos + 1);
-        if (nextColon == std::string::npos) {
-            nextColon = content.length();
+        if (content[pos] != ':') {
+            ++pos;
+            continue;
         }
 
-        std::string part = content.substr(colonPos + 1, nextColon - colonPos - 1);
+        size_t keyStart = pos + 1;
+        size_t spacePos = content.find(' ', keyStart);
+        if (spacePos == std::string::npos) break;
 
-        size_t spacePos = part.find(' ');
-        if (spacePos != std::string::npos) {
-            std::string name = part.substr(0, spacePos);
-            std::string value = trim(part.substr(spacePos + 1));
+        std::string name = content.substr(keyStart, spacePos - keyStart);
+        size_t valueStart = spacePos + 1;
 
-            if (name == "key1") {
-                if (value.length() > 2 &&
-                   (value.back() == 'd' || value.back() == 'D')) {
-                    std::string numStr = value.substr(0, value.length() - 1);
-                    size_t dotPos = numStr.find('.');
+        if (name == "key1") {
+            size_t valueEnd = content.find(':', valueStart);
+            if (valueEnd == std::string::npos) valueEnd = content.length();
+            std::string value = trim(content.substr(valueStart, valueEnd - valueStart));
 
-                    if (dotPos != std::string::npos &&
-                        dotPos > 0 &&
-                        dotPos < numStr.length() - 1) {
+            if (value.length() > 2 && (value.back() == 'd' || value.back() == 'D')) {
+                std::string numStr = value.substr(0, value.length() - 1);
+                size_t dotPos = numStr.find('.');
 
-                        bool valid = true;
-                        for (size_t i = 0; i < numStr.length(); ++i) {
-                            if (i == dotPos) continue;
-                            if (!std::isdigit(static_cast<unsigned char>(numStr[i]))) {
-                                valid = false;
-                                break;
-                            }
+                if (dotPos != std::string::npos && dotPos > 0 && dotPos < numStr.length() - 1) {
+                    bool valid = true;
+                    for (size_t i = 0; i < numStr.length(); ++i) {
+                        if (i == dotPos) continue;
+                        if (!std::isdigit(static_cast<unsigned char>(numStr[i]))) {
+                            valid = false;
+                            break;
                         }
-
-                        if (valid) {
-                            try {
-                                size_t idx = 0;
-                                data.key1 = std::stod(numStr, &idx);
-                                if (idx == numStr.length()) {
-                                    hasKey1 = true;
-                                }
-                            } catch (...) {}
-                        }
+                    }
+                    if (valid) {
+                        try {
+                            size_t idx = 0;
+                            data.key1 = std::stod(numStr, &idx);
+                            if (idx == numStr.length()) hasKey1 = true;
+                        } catch (...) {}
                     }
                 }
             }
-            else if (name == "key2") {
-                if (value.length() >= 4) {
-                    std::string suffix = value.substr(value.length() - 3);
-                    if (suffix == "ull" || suffix == "ULL") {
-                        std::string numStr = value.substr(0, value.length() - 3);
-                        if (isDecimalNumber(numStr)) {
-                            try {
-                                size_t idx = 0;
-                                data.key2 = std::stoull(numStr, &idx);
-                                if (idx == numStr.length()) {
-                                    hasKey2 = true;
-                                }
-                            } catch (...) {}
-                        }
+            pos = valueEnd;
+        }
+        else if (name == "key2") {
+            size_t valueEnd = content.find(':', valueStart);
+            if (valueEnd == std::string::npos) valueEnd = content.length();
+            std::string value = trim(content.substr(valueStart, valueEnd - valueStart));
+
+            if (value.length() >= 4) {
+                std::string suffix = value.substr(value.length() - 3);
+                if (suffix == "ull" || suffix == "ULL") {
+                    std::string numStr = value.substr(0, value.length() - 3);
+                    if (isDecimalNumber(numStr)) {
+                        try {
+                            size_t idx = 0;
+                            data.key2 = std::stoull(numStr, &idx);
+                            if (idx == numStr.length()) hasKey2 = true;
+                        } catch (...) {}
                     }
                 }
             }
-            else if (name == "key3") {
-                if (value.length() >= 2 &&
-                    value.front() == '"' &&
-                    value.back() == '"') {
-                    data.key3 = value.substr(1, value.length() - 2);
+            pos = valueEnd;
+        }
+        else if (name == "key3") {
+            size_t quoteStart = content.find('"', valueStart);
+            if (quoteStart != std::string::npos) {
+                size_t quoteEnd = content.find('"', quoteStart + 1);
+                if (quoteEnd != std::string::npos) {
+                    data.key3 = content.substr(quoteStart + 1, quoteEnd - quoteStart - 1);
                     hasKey3 = true;
+                    pos = content.find(':', quoteEnd + 1);
+                    if (pos == std::string::npos) break;
+                    continue;
                 }
             }
+            pos = content.find(':', valueStart);
+            if (pos == std::string::npos) break;
         }
-
-        pos = nextColon;
+        else {
+            size_t nextColon = content.find(':', valueStart);
+            pos = (nextColon == std::string::npos) ? content.length() : nextColon;
+        }
     }
 
     if (!hasKey1 || !hasKey2 || !hasKey3) {
