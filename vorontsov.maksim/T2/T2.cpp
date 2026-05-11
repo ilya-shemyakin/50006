@@ -69,9 +69,7 @@ private:
                 isValid_ = true;
                 return;
             }
-
             is_->clear();
-            
             int ch = is_->peek();
             while (ch != '(' && ch != std::char_traits<char>::eof()) {
                 is_->get();
@@ -108,3 +106,4 @@ int main() {
 
     return 0;
 }
+
