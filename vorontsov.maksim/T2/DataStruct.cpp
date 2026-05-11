@@ -3,7 +3,7 @@
 
 #include "DataStruct.h"
 #include "StreamGuard.h"
- 
+
 std::istream& operator>>(std::istream& stream, DataStruct& data) {
     std::istream::sentry sentry(stream);
     if (!sentry) {
