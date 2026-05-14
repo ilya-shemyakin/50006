@@ -179,11 +179,11 @@ int main()
         {
             std::cin.clear();
             std::string badLine;
-            std::getline(std::cin, badLine); 
+            std::getline(std::cin, badLine);
         }
     }
 
-    std::sort(data.begin(), data.end(), 
+    std::sort(data.begin(), data.end(),
         [](const DataStruct& a, const DataStruct& b) {
             if (a.key1 != b.key1)
                 return a.key1 < b.key1;
