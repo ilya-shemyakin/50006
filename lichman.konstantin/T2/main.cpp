@@ -1,9 +1,10 @@
-#include <vector>
+﻿#include <vector>
 #include <string>
 #include <algorithm>
 #include <iterator>
 #include <iomanip>
 #include <iostream>
+#include <cctype>
 
 struct DataStruct {
     double key1;
@@ -41,7 +42,8 @@ bool readDblit(std::istream& in, double& val)
     while (std::isdigit(in.peek()))
         s += static_cast<char>(in.get());
 
-    if (in.peek() != 'd' && in.peek() != 'D')
+    char suffix = static_cast<char>(in.get());
+    if (suffix != 'd' && suffix != 'D')
         return false;
 
     val = std::stod(s);
@@ -73,11 +75,10 @@ bool readString(std::istream& in, std::string& val)
     skipSpaces(in);
 
     char c0 = in.get();
-
     if (c0 != '"')
         return false;
 
-    while (in.peek() != '"')
+    while (in && in.peek() != '"')
         val += static_cast<char>(in.get());
 
     in.get();
@@ -86,6 +87,9 @@ bool readString(std::istream& in, std::string& val)
 
 std::istream& operator>>(std::istream& in, DataStruct& ds)
 {
+    skipSpaces(in);
+    if (in.peek() == EOF) return in;
+
     DataStruct tmp{};
     bool gotKey1 = false, gotKey2 = false, gotKey3 = false;
 
@@ -98,9 +102,10 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
 
     for (int i = 0; i < 3; i++) {
         std::string keyName;
-        while (in.peek() != ' ')
+        while (in && in.peek() != ' ' && in.peek() != ':')
             keyName += static_cast<char>(in.get());
-        in.get();
+
+        skipSpaces(in);
 
         if (keyName == "key1") {
             if (!readDblit(in, tmp.key1)) {
@@ -128,6 +133,7 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
             return in;
         }
 
+        skipSpaces(in);
         if (in.get() != ':') {
             in.setstate(std::ios::failbit);
             return in;
@@ -145,21 +151,14 @@ std::istream& operator>>(std::istream& in, DataStruct& ds)
     }
 
     ds = tmp;
-
     return in;
 }
 
 std::ostream& operator<<(std::ostream& out, const DataStruct& ds)
 {
-    out << "(:key1 ";
-    out << std::fixed << std::setprecision(1) << ds.key1 << "d";
-    out << ":key2 ";
-    out << "0x" << std::uppercase << std::hex << ds.key2;
-    out << std::dec;
-    out << ":key3 ";
-    out << '"' << ds.key3 << '"';
-    out << ":)";
-
+    out << "(:key1 " << std::fixed << std::setprecision(1) << ds.key1 << "d";
+    out << ":key2 0x" << std::uppercase << std::hex << ds.key2 << std::dec;
+    out << ":key3 \"" << ds.key3 << "\":)";
     return out;
 }
 
@@ -167,7 +166,7 @@ int main()
 {
     std::vector<DataStruct> data;
 
-    while (!std::cin.eof())
+    while (std::cin)
     {
         std::copy(
             std::istream_iterator<DataStruct>(std::cin),
