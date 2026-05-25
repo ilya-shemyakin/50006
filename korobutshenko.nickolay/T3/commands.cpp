@@ -56,7 +56,7 @@ void processCommands(std::vector<Polygon>& polygons)
         }
         else
         {
-          int vertexCount = std::stoi(arg);
+          size_t vertexCount = static_cast<size_t>(std::stoi(arg));
           if (vertexCount < 3)
           {
             throw std::runtime_error("");
@@ -86,7 +86,7 @@ void processCommands(std::vector<Polygon>& polygons)
         }
         else
         {
-          int vertexCount = std::stoi(arg);
+          size_t vertexCount = static_cast<size_t>(std::stoi(arg));
           if (vertexCount < 3)
           {
             throw std::runtime_error("");
@@ -170,16 +170,6 @@ void processCommands(std::vector<Polygon>& polygons)
         }
         Polygon target = parsePolygon(polygonStr);
         int result = duplicateEcho(polygons, target);
-
-        for (const auto& poly : polygons)
-        {
-          std::cout << poly.points.size();
-          for (const auto& point : poly.points)
-          {
-            std::cout << " (" << point.x << ";" << point.y << ")";
-          }
-          std::cout << "\n";
-        }
 
         std::cout << result << "\n";
       }
