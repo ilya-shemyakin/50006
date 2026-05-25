@@ -5,17 +5,17 @@
 
 int countEven(const std::vector<Polygon>& polygons);
 int countOdd(const std::vector<Polygon>& polygons);
-int countByVertexCount(const std::vector<Polygon>& polygons, int vertexCount);
+int countByVertexCount(const std::vector<Polygon>& polygons, size_t vertexCount);
 
 double maxArea(const std::vector<Polygon>& polygons);
-int maxVertexCount(const std::vector<Polygon>& polygons);
+size_t maxVertexCount(const std::vector<Polygon>& polygons);
 
 double minArea(const std::vector<Polygon>& polygons);
-int minVertexCount(const std::vector<Polygon>& polygons);
+size_t minVertexCount(const std::vector<Polygon>& polygons);
 
 double sumAreaEven(const std::vector<Polygon>& polygons);
 double sumAreaOdd(const std::vector<Polygon>& polygons);
-double sumAreaByVertexCount(const std::vector<Polygon>& polygons, int vertexCount);
+double sumAreaByVertexCount(const std::vector<Polygon>& polygons, size_t vertexCount);
 double meanArea(const std::vector<Polygon>& polygons);
 
 int maxConsecutiveEqual(const std::vector<Polygon>& polygons, const Polygon& target);

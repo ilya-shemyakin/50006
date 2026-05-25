@@ -52,7 +52,7 @@ Polygon parsePolygon(const std::string& string)
   }
 
   size_t numberOfWS = 0;
-  for (auto i = 0; i < string.length(); ++i)
+  for (size_t i = 0; i < string.length(); ++i)
   {
     if (string[i] == ' ')
     {

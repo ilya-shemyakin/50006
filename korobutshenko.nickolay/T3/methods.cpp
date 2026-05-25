@@ -7,7 +7,7 @@
 
 using namespace std::placeholders;
 
-int getVertexCount(const Polygon& polygon)
+size_t getVertexCount(const Polygon& polygon)
 {
   return polygon.points.size();
 }
@@ -22,7 +22,7 @@ bool isOddVertexCount(const Polygon& polygon)
   return polygon.points.size() % 2 == 1;
 }
 
-bool isVertexCount(const Polygon& polygon, int vertexCount)
+bool isVertexCount(const Polygon& polygon, size_t vertexCount)
 {
   return polygon.points.size() == vertexCount;
 }
@@ -70,9 +70,9 @@ int countOdd(const std::vector<Polygon>& polygons)
   return std::count_if(polygons.begin(), polygons.end(), isOddVertexCount);
 }
 
-int countByVertexCount(const std::vector<Polygon>& polygons, int vertexCount)
+int countByVertexCount(const std::vector<Polygon>& polygons, size_t vertexCount)
 {
-  auto pred = std::bind(std::equal_to<int>(),
+  auto pred = std::bind(std::equal_to<size_t>(),
     std::bind(getVertexCount, _1),
     vertexCount);
   return std::count_if(polygons.begin(), polygons.end(), pred);
@@ -93,14 +93,14 @@ double maxArea(const std::vector<Polygon>& polygons)
   return area(*it);
 }
 
-int maxVertexCount(const std::vector<Polygon>& polygons)
+size_t maxVertexCount(const std::vector<Polygon>& polygons)
 {
   if (polygons.empty())
   {
     throw std::runtime_error("is empty");
   }
 
-  auto pred = std::bind(std::less<int>(),
+  auto pred = std::bind(std::less<size_t>(),
     std::bind(getVertexCount, _1),
     std::bind(getVertexCount, _2));
 
@@ -124,14 +124,14 @@ double minArea(const std::vector<Polygon>& polygons)
   return area(*it);
 }
 
-int minVertexCount(const std::vector<Polygon>& polygons)
+size_t minVertexCount(const std::vector<Polygon>& polygons)
 {
   if (polygons.empty())
   {
     throw std::runtime_error("is empty");
   }
 
-  auto pred = std::bind(std::less<int>(),
+  auto pred = std::bind(std::less<size_t>(),
     std::bind(getVertexCount, _1),
     std::bind(getVertexCount, _2));
 
@@ -159,7 +159,7 @@ double sumAreaOdd(const std::vector<Polygon>& polygons)
     std::bind(std::plus<double>(), _1, std::bind(oddArea, _2)));
 }
 
-double sumAreaByVertexCount(const std::vector<Polygon>& polygons, int vertexCount)
+double sumAreaByVertexCount(const std::vector<Polygon>& polygons, size_t vertexCount)
 {
   auto correctVertexCountArea = std::bind(std::multiplies<double>(),
     std::bind(isVertexCount, _1, _2),
