@@ -170,6 +170,17 @@ void processCommands(std::vector<Polygon>& polygons)
         }
         Polygon target = parsePolygon(polygonStr);
         int result = duplicateEcho(polygons, target);
+
+        for (const auto& poly : polygons)
+        {
+          std::cout << poly.points.size();
+          for (const auto& point : poly.points)
+          {
+            std::cout << " (" << point.x << ";" << point.y << ")";
+          }
+          std::cout << "\n";
+        }
+
         std::cout << result << "\n";
       }
       else
