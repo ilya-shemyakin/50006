@@ -187,9 +187,11 @@ int maxConsecutiveEqual(const std::vector<Polygon>& polygons, const Polygon& tar
   return result.first_;
 }
 
-int duplicateEcho(const std::vector<Polygon>& polygons, const Polygon& target)
+int duplicateEcho(std::vector<Polygon>& polygons, const Polygon& target)
 {
   auto newVector = std::accumulate(polygons.cbegin(), polygons.cend(),
     accumulatorEcho(target), fEcho);
-  return newVector.result.size() - polygons.size();
+  int addedElements = newVector.result.size() - polygons.size();
+  polygons = std::move(newVector.result);
+  return addedElements;
 }

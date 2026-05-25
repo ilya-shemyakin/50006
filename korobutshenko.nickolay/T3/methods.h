@@ -19,6 +19,6 @@ double sumAreaByVertexCount(const std::vector<Polygon>& polygons, size_t vertexC
 double meanArea(const std::vector<Polygon>& polygons);
 
 int maxConsecutiveEqual(const std::vector<Polygon>& polygons, const Polygon& target);
-int duplicateEcho(const std::vector<Polygon>& polygons, const Polygon& target);
+int duplicateEcho(std::vector<Polygon>& polygons, const Polygon& target);
 
 #endif
