@@ -9,11 +9,11 @@ std::vector<std::string> split(const std::string& line) {
     std::istringstream iss(line);
     std::vector<std::string> result;
     std::string word;
-    
+
     while (iss >> word) {
         result.push_back(word);
     }
-    
+
     return result;
 }
 
