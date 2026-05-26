@@ -8,6 +8,7 @@ struct Point {
     Point(double xCoordinate, double yCoordinate)
         : x(xCoordinate), y(yCoordinate) {
     }
+
 };
 
 #endif
