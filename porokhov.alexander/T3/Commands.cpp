@@ -106,7 +106,6 @@ void processCommands(const std::vector<Polygon>& figures) {
                 }
             }
 
-            // Команда MAXSEQ для варианта 11
             else if (cmd == "MAXSEQ") {
                 if (words.size() < 2) {
                     throw std::runtime_error("");
@@ -124,7 +123,6 @@ void processCommands(const std::vector<Polygon>& figures) {
                 std::cout << maxConsecutiveEqual(figures, target) << std::endl;
             }
 
-            // Команда PERMS для варианта 11
             else if (cmd == "PERMS") {
                 if (words.size() < 2) {
                     throw std::runtime_error("");
