@@ -73,7 +73,7 @@ std::vector<Polygon> readShapesFromFile(const std::string& filename) {
             result.push_back(parsePolygon(line));
         }
         catch (...) {
-            // Игнорируем некорректные строки
+            
         }
     }
 
