@@ -40,7 +40,7 @@ std::istream& operator>>(std::istream& in, Polygon& poly) {
         return in;
     }
     std::string leftover;
-    if (in >> leftover) {   
+    if (in >> leftover) {
         poly.points.clear();
         in.setstate(std::ios::failbit);
     }
