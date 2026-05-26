@@ -27,13 +27,27 @@ std::istream& operator>>(std::istream& in, Point& p) {
     if (!(in >> c) || c != ')') { in.setstate(std::ios::failbit); return in; }
     return in;
 }
-
 std::istream& operator>>(std::istream& in, Polygon& poly) {
     size_t n = 0;
-    if (!(in >> n) || n < 3) { in.setstate(std::ios::failbit); return in; }
+    if (!(in >> n) || n < 3) {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
     poly.points.resize(n);
     std::copy_n(std::istream_iterator<Point>(in), n, poly.points.begin());
-    if (!in) poly.points.clear();
+    if (!in) {
+        poly.points.clear();
+        return in;
+    }
+    std::string leftover;
+    if (in >> leftover) {   
+        poly.points.clear();
+        in.setstate(std::ios::failbit);
+    }
+    else {
+        if (in.eof())
+            in.clear(in.rdstate() & ~std::ios::failbit);
+    }
     return in;
 }
 
