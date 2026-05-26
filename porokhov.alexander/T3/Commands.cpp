@@ -7,7 +7,14 @@
 
 std::vector<std::string> split(const std::string& line) {
     std::istringstream iss(line);
-    return { std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>() };
+    std::vector<std::string> result;
+    std::string word;
+    
+    while (iss >> word) {
+        result.push_back(word);
+    }
+    
+    return result;
 }
 
 void processCommands(const std::vector<Polygon>& figures) {
