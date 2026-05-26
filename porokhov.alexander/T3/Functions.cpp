@@ -108,7 +108,6 @@ double meanArea(const std::vector<Polygon>& figures) {
     return total / figures.size();
 }
 
-// MAXSEQ - максимальное количество идущих подряд фигур, идентичных target
 int maxConsecutiveEqual(const std::vector<Polygon>& figures, const Polygon& target) {
     auto result = std::accumulate(
         figures.cbegin(), figures.cend(),
@@ -120,7 +119,6 @@ int maxConsecutiveEqual(const std::vector<Polygon>& figures, const Polygon& targ
     return result.first;
 }
 
-// PERMS - количество фигур, являющихся перестановкой вершин target
 int countPermutations(const std::vector<Polygon>& figures, const Polygon& target) {
     auto pred = std::bind(isPermutation, _1, std::cref(target));
     return std::count_if(figures.cbegin(), figures.cend(), pred);
