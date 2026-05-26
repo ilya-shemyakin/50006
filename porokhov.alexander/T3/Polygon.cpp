@@ -72,9 +72,7 @@ std::vector<Polygon> readShapesFromFile(const std::string& filename) {
         try {
             result.push_back(parsePolygon(line));
         }
-        catch (...) {
-            
-        }
+        catch (...) {}
     }
 
     return result;
