@@ -190,8 +190,8 @@ void cmdRmecho(std::vector<Polygon>& polys, const Polygon& target) {
                 ++j;
             }
 
-            removed += (j - i);  
-            i = j;           
+            removed += (j - i);
+            i = j;
         }
         else {
             result.push_back(polys[i]);
