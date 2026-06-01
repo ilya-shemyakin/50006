@@ -63,7 +63,7 @@ double sumAreaByVertexCount(const std::vector<Polygon>& figures, int vertexCount
 
 double meanArea(const std::vector<Polygon>& figures) {
     if (figures.empty()) {
-        return 0.0;
+        throw std::runtime_error("No figures");
     }
     double total = std::accumulate(figures.cbegin(), figures.cend(), 0.0,
         [](double sum, const Polygon& p) {
@@ -74,7 +74,7 @@ double meanArea(const std::vector<Polygon>& figures) {
 
 double maxArea(const std::vector<Polygon>& figures) {
     if (figures.empty()) {
-        return 0.0;
+        throw std::runtime_error("No figures");
     }
     auto comp = std::bind(std::less<>(), std::bind(area, _1), std::bind(area, _2));
     auto it = std::max_element(figures.cbegin(), figures.cend(), comp);
@@ -83,7 +83,7 @@ double maxArea(const std::vector<Polygon>& figures) {
 
 int maxVertexCount(const std::vector<Polygon>& figures) {
     if (figures.empty()) {
-        return 0;
+        throw std::runtime_error("No figures");
     }
     auto comp = std::bind(std::less<>(), std::bind(getVertexCount, _1), std::bind(getVertexCount, _2));
     auto it = std::max_element(figures.cbegin(), figures.cend(), comp);
@@ -92,7 +92,7 @@ int maxVertexCount(const std::vector<Polygon>& figures) {
 
 double minArea(const std::vector<Polygon>& figures) {
     if (figures.empty()) {
-        return 0.0;
+        throw std::runtime_error("No figures");
     }
     auto comp = std::bind(std::less<>(), std::bind(area, _1), std::bind(area, _2));
     auto it = std::min_element(figures.cbegin(), figures.cend(), comp);
@@ -101,7 +101,7 @@ double minArea(const std::vector<Polygon>& figures) {
 
 int minVertexCount(const std::vector<Polygon>& figures) {
     if (figures.empty()) {
-        return 0;
+        throw std::runtime_error("No figures");
     }
     auto comp = std::bind(std::less<>(), std::bind(getVertexCount, _1), std::bind(getVertexCount, _2));
     auto it = std::min_element(figures.cbegin(), figures.cend(), comp);
