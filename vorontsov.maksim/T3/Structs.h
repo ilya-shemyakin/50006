@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STRUCTS_H
+#define STRUCTS_H
 #include <iostream>
 #include <vector>
 #include <string>
@@ -38,3 +39,4 @@ struct BoundingBox {
     int maxY_;
 };
 Polygon parsePolygon(const std::string& string);
+#endif
