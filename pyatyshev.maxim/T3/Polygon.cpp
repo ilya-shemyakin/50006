@@ -83,7 +83,6 @@ std::vector<Polygon> readShapesFromFile(const std::string& filename) {
 bool isRectangle(const Polygon& p) {
     if (p.points.size() != 4) return false;
 
-
     auto distSq = [](const Point& a, const Point& b) {
         int dx = a.x - b.x;
         int dy = a.y - b.y;
@@ -95,7 +94,6 @@ bool isRectangle(const Polygon& p) {
         sides.push_back(distSq(p.points[i], p.points[(i+1)%4]));
     }
 
-
     return (sides[0] == sides[2]) && (sides[1] == sides[3]);
 }
 
@@ -103,14 +101,12 @@ bool isRectangle(const Polygon& p) {
 Polygon normalizeByMinPoint(const Polygon& p) {
     if (p.points.empty()) return p;
 
-
     Point minPt = p.points[0];
     for (const auto& pt : p.points) {
         if (pt.x < minPt.x || (pt.x == minPt.x && pt.y < minPt.y)) {
             minPt = pt;
         }
     }
-
 
     Polygon result;
     for (const auto& pt : p.points) {

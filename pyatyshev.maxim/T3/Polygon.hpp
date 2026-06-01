@@ -33,4 +33,3 @@ bool isSameShape(const Polygon& a, const Polygon& b);
 Polygon normalizeByMinPoint(const Polygon& p);
 
 #endif
-
