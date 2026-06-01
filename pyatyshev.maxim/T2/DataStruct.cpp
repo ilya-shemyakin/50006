@@ -17,10 +17,12 @@ static bool parseDouble(const std::string& str, double& value)
     if (str.length() < 2) return false;
     if (str.back() != 'd' && str.back() != 'D') return false;
 
+
     std::string numStr = str.substr(0, str.length() - 1);
     size_t dotPos = numStr.find('.');
     if (dotPos == std::string::npos) return false;
     if (dotPos == 0 || dotPos == numStr.length() - 1) return false;
+
 
     for (size_t i = 0; i < numStr.length(); ++i) {
         if (i == dotPos) continue;
