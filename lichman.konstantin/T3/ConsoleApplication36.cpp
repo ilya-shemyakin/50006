@@ -1,4 +1,4 @@
-#include "Polygon.h"
+﻿#include "Polygon.h"
 #include "Commands.h"
 #include <iostream>
 #include <fstream>
