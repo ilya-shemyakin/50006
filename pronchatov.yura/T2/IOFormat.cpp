@@ -8,16 +8,16 @@
 #include <stdexcept>
 #include <string>
 
-namespace 
+namespace
 {
-    bool readOneSpace(std::istream& in) 
+    bool readOneSpace(std::istream& in)
     {
         char c = '\0';
-        in.get(c); 
+        in.get(c);
 
         if (!in || c != ' ')
         {
-            in.setstate(std::ios::failbit); 
+            in.setstate(std::ios::failbit);
             return false;
         }
 
@@ -30,7 +30,7 @@ namespace
         return true;
     }
 
-    bool readTokenUntilColon(std::istream& in, std::string& token) 
+    bool readTokenUntilColon(std::istream& in, std::string& token)
     {
         token.clear();
 
@@ -50,7 +50,7 @@ namespace
         return true;
     }
 
-    bool hasWhitespace(const std::string& str) 
+    bool hasWhitespace(const std::string& str)
     {
         for (char c : str)
         {
@@ -63,7 +63,7 @@ namespace
         return false;
     }
 
-    bool isDblSciToken(const std::string& token) 
+    bool isDblSciToken(const std::string& token)
     {
         if (token.empty() || hasWhitespace(token))
         {
@@ -95,7 +95,7 @@ namespace
 
         ++pos;
 
-        std::size_t digitsAfterDot = pos; 
+        std::size_t digitsAfterDot = pos;
         while (pos < token.size() && std::isdigit(static_cast<unsigned char>(token[pos])))
         {
             ++pos;

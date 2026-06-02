@@ -29,12 +29,12 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         return in;
     }
 
-    DataStruct temp{}; 
-    bool hasKey1 = false; 
+    DataStruct temp{};
+    bool hasKey1 = false;
     bool hasKey2 = false;
     bool hasKey3 = false;
 
-    in >> DelimeterIO{ '(' }; 
+    in >> DelimeterIO{ '(' };
     if (!in)
     {
         return in;
@@ -42,7 +42,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
 
     while (!(hasKey1 && hasKey2 && hasKey3))
     {
-        in >> DelimeterIO{ ':' }; 
+        in >> DelimeterIO{ ':' };
         if (!in)
         {
             return in;
@@ -55,14 +55,14 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
             return in;
         }
 
-        if (label == "key1" && !hasKey1) 
+        if (label == "key1" && !hasKey1)
         {
-            in >> DblSciIO{ temp.key1 }; 
+            in >> DblSciIO{ temp.key1 };
             if (!in)
             {
                 return in;
             }
-            hasKey1 = true; 
+            hasKey1 = true;
         }
         else if (label == "key2" && !hasKey2)
         {
@@ -84,7 +84,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         }
         else
         {
-            in.setstate(std::ios::failbit); 
+            in.setstate(std::ios::failbit);
             return in;
         }
     }
@@ -95,7 +95,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         return in;
     }
 
-    in >> DelimeterIO{ ')' }; 
+    in >> DelimeterIO{ ')' };
     if (!in)
     {
         return in;

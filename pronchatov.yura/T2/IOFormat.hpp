@@ -4,22 +4,22 @@
 #include <ios>
 #include <string>
 
-struct DelimeterIO 
+struct DelimeterIO
 {
     char exp;
 };
 
-struct DblSciIO 
+struct DblSciIO
 {
     double& ref;
 };
 
-struct UllBinIO 
+struct UllBinIO
 {
     unsigned long long& ref;
 };
 
-struct StringIO 
+struct StringIO
 {
     std::string& ref;
 };
