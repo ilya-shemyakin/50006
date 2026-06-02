@@ -1,12 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include <algorithm>
 #include <iterator>
-#include <string>
-#include <sstream>
 #include <iomanip>
 #include <cctype>
-#include <cmath>
 
 struct DataStruct {
     double key1;
@@ -14,167 +12,138 @@ struct DataStruct {
     std::string key3;
 };
 
-static void trim(std::string& s) {
+static std::string trim(const std::string& s) {
     size_t start = s.find_first_not_of(" \t\n\r\f\v");
-    if (start == std::string::npos) {
-        s.clear();
-        return;
-    }
+    if (start == std::string::npos) return "";
     size_t end = s.find_last_not_of(" \t\n\r\f\v");
-    s = s.substr(start, end - start + 1);
+    return s.substr(start, end - start + 1);
 }
 
-static bool parseDoubleLit(const std::string& token, double& value) {
-    if (token.empty()) return false;
-    char last = token.back();
+static std::vector<std::string> splitByColonOutsideQuotes(const std::string& s) {
+    std::vector<std::string> result;
+    bool inQuotes = false;
+    size_t start = 0;
+    for (size_t i = 0; i < s.size(); ++i) {
+        if (s[i] == '"') inQuotes = !inQuotes;
+        if (!inQuotes && s[i] == ':') {
+            result.push_back(s.substr(start, i - start));
+            start = i + 1;
+        }
+    }
+    result.push_back(s.substr(start));
+    return result;
+}
+
+static bool parseDoubleLit(const std::string& str, double& value) {
+    if (str.empty()) return false;
+    std::string s = trim(str);
+    if (s.length() < 2) return false;
+    char last = s.back();
     if (last != 'd' && last != 'D') return false;
-    std::string numStr = token.substr(0, token.size() - 1);
+    std::string numStr = s.substr(0, s.length() - 1);
     size_t dotPos = numStr.find('.');
     if (dotPos == std::string::npos) return false;
-    if (dotPos == 0 || dotPos == numStr.size() - 1) return false;
-    if (numStr.find('e') != std::string::npos || numStr.find('E') != std::string::npos)
+    if (dotPos == 0 || dotPos == numStr.length() - 1) return false;
+    try {
+        size_t pos;
+        double val = std::stod(numStr, &pos);
+        if (pos != numStr.length()) return false;
+        value = val;
+        return true;
+    } catch (...) {
         return false;
-    char* endptr = nullptr;
-    double v = std::strtod(numStr.c_str(), &endptr);
-    if (endptr != numStr.c_str() + numStr.size()) return false;
-    value = v;
-    return true;
+    }
 }
 
-static bool parseLongLongLit(const std::string& token, long long& value) {
-    if (token.empty()) return false;
-    std::string numStr = token;
-    if (numStr.size() >= 2) {
-        std::string suffix = numStr.substr(numStr.size() - 2);
-        if (suffix == "LL" || suffix == "ll") {
-            numStr = numStr.substr(0, numStr.size() - 2);
+static bool parseLongLongLit(const std::string& str, long long& value) {
+    if (str.empty()) return false;
+    std::string s = trim(str);
+    bool hasSuffix = false;
+    if (s.length() >= 2) {
+        std::string suffix = s.substr(s.length() - 2);
+        if (suffix == "LL" || suffix == "Ll" || suffix == "lL" || suffix == "ll") {
+            hasSuffix = true;
+            s = s.substr(0, s.length() - 2);
+            if (s.empty()) return false;
         }
     }
-    if (numStr.empty()) return false;
-    if (numStr.size() > 1 && numStr[0] == '0') return false;
-    if (numStr[0] == '-' && numStr.size() > 2 && numStr[1] == '0') return false;
-    char* endptr = nullptr;
-    long long v = std::strtoll(numStr.c_str(), &endptr, 10);
-    if (endptr != numStr.c_str() + numStr.size()) return false;
-    value = v;
-    return true;
-}
-
-static bool parseQuotedString(const std::string& token, std::string& value) {
-    if (token.size() < 2) return false;
-    if (token.front() != '"' || token.back() != '"') return false;
-    value = token.substr(1, token.size() - 2);
-    return true;
-}
-
-static bool parseRecord(const std::string& line, DataStruct& out) {
-    std::string s = line;
-    trim(s);
-    if (s.empty() || s.front() != '(' || s.back() != ')')
-        return false;
-
-    std::string content = s.substr(1, s.size() - 2);
-    trim(content);
-    if (content.empty())
-        return false;
-
-    std::vector<std::string> tokens;
-    std::string cur;
-    bool inQuotes = false;
-    for (char c : content) {
-        if (c == '"') {
-            inQuotes = !inQuotes;
-            cur.push_back(c);
-        } else if (c == ':' && !inQuotes) {
-            if (!cur.empty()) {
-                tokens.push_back(cur);
-                cur.clear();
-            }
-        } else {
-            cur.push_back(c);
+    if (!s.empty() && s[0] == '-') {
+        if (s.length() == 1) return false;
+        for (size_t i = 1; i < s.length(); ++i) {
+            if (!std::isdigit(static_cast<unsigned char>(s[i]))) return false;
+        }
+    } else {
+        for (char c : s) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) return false;
         }
     }
-    if (!cur.empty())
-        tokens.push_back(cur);
+    try {
+        size_t pos;
+        long long val = std::stoll(s, &pos);
+        if (pos != s.length()) return false;
+        value = val;
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+static bool parseQuotedString(const std::string& str, std::string& value) {
+    std::string s = trim(str);
+    if (s.length() < 2) return false;
+    if (s.front() != '"' || s.back() != '"') return false;
+    value = s.substr(1, s.length() - 2);
+    return true;
+}
+
+static bool parseDataStruct(const std::string& line, DataStruct& ds) {
+    std::string trimmed = trim(line);
+    if (trimmed.empty() || trimmed.front() != '(' || trimmed.back() != ')')
+        return false;
+    std::string content = trimmed.substr(1, trimmed.length() - 2);
+    std::vector<std::string> parts = splitByColonOutsideQuotes(content);
+    parts.erase(std::remove_if(parts.begin(), parts.end(),
+        [](const std::string& p) { return p.empty(); }), parts.end());
 
     bool hasKey1 = false, hasKey2 = false, hasKey3 = false;
     double k1 = 0.0;
     long long k2 = 0;
     std::string k3;
 
-    for (const auto& token : tokens) {
-        size_t spacePos = token.find(' ');
-        if (spacePos == std::string::npos)
-            return false;
-        std::string key = token.substr(0, spacePos);
-        std::string val = token.substr(spacePos + 1);
-        trim(key);
-        trim(val);
-
+    for (const std::string& part : parts) {
+        size_t spacePos = part.find(' ');
+        if (spacePos == std::string::npos) return false;
+        std::string key = trim(part.substr(0, spacePos));
+        std::string value = trim(part.substr(spacePos + 1));
         if (key == "key1") {
-            if (hasKey1 || !parseDoubleLit(val, k1))
-                return false;
+            if (hasKey1) return false;
+            if (!parseDoubleLit(value, k1)) return false;
             hasKey1 = true;
         } else if (key == "key2") {
-            if (hasKey2 || !parseLongLongLit(val, k2))
-                return false;
+            if (hasKey2) return false;
+            if (!parseLongLongLit(value, k2)) return false;
             hasKey2 = true;
         } else if (key == "key3") {
-            if (hasKey3 || !parseQuotedString(val, k3))
-                return false;
+            if (hasKey3) return false;
+            if (!parseQuotedString(value, k3)) return false;
             hasKey3 = true;
         } else {
             return false;
         }
     }
-
-    if (!hasKey1 || !hasKey2 || !hasKey3)
-        return false;
-
-    out = DataStruct{k1, k2, k3};
-    return true;
+    if (hasKey1 && hasKey2 && hasKey3) {
+        ds.key1 = k1;
+        ds.key2 = k2;
+        ds.key3 = k3;
+        return true;
+    }
+    return false;
 }
 
-static std::string readBalancedRecord(std::istream& in) {
-    char ch;
-    while (in.get(ch)) {
-        if (ch == '(') {
-            in.putback(ch);
-            break;
-        }
-    }
-    if (!in || in.peek() != '(')
-        return {};
-
-    std::string record;
-    int depth = 0;
-    while (in.get(ch)) {
-        record.push_back(ch);
-        if (ch == '(')
-            ++depth;
-        else if (ch == ')') {
-            --depth;
-            if (depth == 0)
-                break;
-        }
-    }
-    if (depth != 0) {
-        in.setstate(std::ios::failbit);
-        return {};
-    }
-    return record;
-}
-
-std::istream& operator>>(std::istream& in, DataStruct& dest) {
-    while (in) {
-        std::string record = readBalancedRecord(in);
-        if (!in || record.empty()) {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-        DataStruct tmp;
-        if (parseRecord(record, tmp)) {
-            dest = tmp;
+std::istream& operator>>(std::istream& in, DataStruct& ds) {
+    std::string line;
+    while (std::getline(in, line)) {
+        if (parseDataStruct(line, ds)) {
             return in;
         }
     }
@@ -182,26 +151,27 @@ std::istream& operator>>(std::istream& in, DataStruct& dest) {
     return in;
 }
 
-std::ostream& operator<<(std::ostream& os, const DataStruct& ds) {
-    os << "(:key1 " << std::fixed << std::setprecision(1) << ds.key1 << "d"
-       << ":key2 " << ds.key2
-       << ":key3 \"" << ds.key3 << "\":)";
-    return os;
+std::ostream& operator<<(std::ostream& out, const DataStruct& ds) {
+    out << std::fixed << std::setprecision(1);
+    out << "(:key1 " << ds.key1 << "d";
+    out << ":key2 " << ds.key2 << "ll";
+    out << ":key3 \"" << ds.key3 << "\":)";
+    return out;
 }
 
-bool compare(const DataStruct& a, const DataStruct& b) {
+bool comparator(const DataStruct& a, const DataStruct& b) {
     if (a.key1 != b.key1) return a.key1 < b.key1;
     if (a.key2 != b.key2) return a.key2 < b.key2;
-    return a.key3.size() < b.key3.size();
+    return a.key3.length() < b.key3.length();
 }
 
 int main() {
     std::vector<DataStruct> data;
-    std::copy(std::istream_iterator<DataStruct>(std::cin),
-              std::istream_iterator<DataStruct>(),
-              std::back_inserter(data));
-    std::sort(data.begin(), data.end(), compare);
-    std::copy(data.begin(), data.end(),
-              std::ostream_iterator<DataStruct>(std::cout, "\n"));
+    std::istream_iterator<DataStruct> iter(std::cin);
+    std::istream_iterator<DataStruct> end;
+    std::copy(iter, end, std::back_inserter(data));
+    std::sort(data.begin(), data.end(), comparator);
+    std::ostream_iterator<DataStruct> outIter(std::cout, "\n");
+    std::copy(data.begin(), data.end(), outIter);
     return 0;
 }
