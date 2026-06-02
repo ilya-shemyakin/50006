@@ -58,11 +58,9 @@ static bool parseDoubleLit(const std::string& str, double& value) {
 static bool parseLongLongLit(const std::string& str, long long& value) {
     if (str.empty()) return false;
     std::string s = trim(str);
-    bool hasSuffix = false;
     if (s.length() >= 2) {
         std::string suffix = s.substr(s.length() - 2);
         if (suffix == "LL" || suffix == "Ll" || suffix == "lL" || suffix == "ll") {
-            hasSuffix = true;
             s = s.substr(0, s.length() - 2);
             if (s.empty()) return false;
         }
