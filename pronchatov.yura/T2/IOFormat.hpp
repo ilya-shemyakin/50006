@@ -4,22 +4,22 @@
 #include <ios>
 #include <string>
 
-struct DelimeterIO
+struct DelimeterIO // разделитель
 {
     char exp;
 };
 
-struct DblSciIO
+struct DblSciIO // для чтения DBL SCI
 {
     double& ref;
 };
 
-struct UllBinIO
+struct UllBinIO // для чтения ULL BIN (binary)
 {
     unsigned long long& ref;
 };
 
-struct StringIO
+struct StringIO // для чтения строки
 {
     std::string& ref;
 };
@@ -32,17 +32,5 @@ std::istream& operator>>(std::istream& in, StringIO&& dest);
 std::string formatDblSci(double value);
 std::string formatUllBin(unsigned long long value);
 
-class iofguard
-{
-public:
-    explicit iofguard(std::basic_ios<char>& s);
-    ~iofguard();
-
-private:
-    std::basic_ios<char>& s_;
-    char fill_;
-    std::streamsize precision_;
-    std::basic_ios<char>::fmtflags fmt_;
-};
 
 #endif

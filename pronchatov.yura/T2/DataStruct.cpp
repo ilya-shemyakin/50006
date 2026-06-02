@@ -29,12 +29,12 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         return in;
     }
 
-    DataStruct temp{};
-    bool hasKey1 = false;
+    DataStruct temp{}; // временный объект на случай если строка оказалась неправильной
+    bool hasKey1 = false; // проверка что на входе есть все 3 поля
     bool hasKey2 = false;
     bool hasKey3 = false;
 
-    in >> DelimeterIO{ '(' };
+    in >> DelimeterIO{ '(' }; // сначала открывающая скобка
     if (!in)
     {
         return in;
@@ -42,7 +42,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
 
     while (!(hasKey1 && hasKey2 && hasKey3))
     {
-        in >> DelimeterIO{ ':' };
+        in >> DelimeterIO{ ':' }; // потом поиск разделителя
         if (!in)
         {
             return in;
@@ -55,14 +55,14 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
             return in;
         }
 
-        if (label == "key1" && !hasKey1)
+        if (label == "key1" && !hasKey1) // если key1 и раньше его не было
         {
-            in >> DblSciIO{ temp.key1 };
+            in >> DblSciIO{ temp.key1 }; // читаем значение
             if (!in)
             {
                 return in;
             }
-            hasKey1 = true;
+            hasKey1 = true; // ставим флаг
         }
         else if (label == "key2" && !hasKey2)
         {
@@ -84,7 +84,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         }
         else
         {
-            in.setstate(std::ios::failbit);
+            in.setstate(std::ios::failbit); // если поле неизвестное, то запись неправильная
             return in;
         }
     }
@@ -95,7 +95,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         return in;
     }
 
-    in >> DelimeterIO{ ')' };
+    in >> DelimeterIO{ ')' }; // чтение финальных символов
     if (!in)
     {
         return in;
@@ -112,8 +112,6 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& dataStruct)
     {
         return out;
     }
-
-    iofguard guard(out);
 
     out << "(:";
     out << "key1 " << formatDblSci(dataStruct.key1) << ":";

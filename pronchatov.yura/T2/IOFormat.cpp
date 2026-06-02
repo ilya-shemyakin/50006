@@ -8,16 +8,16 @@
 #include <stdexcept>
 #include <string>
 
-namespace
+namespace // всё, что находится внутри namespace видно только внутри этого cpp файла
 {
-    bool readOneSpace(std::istream& in)
+    bool readOneSpace(std::istream& in) // проверяет что есть именно один пробел в потоке
     {
         char c = '\0';
-        in.get(c);
+        in.get(c); // читаем один символ из потока
 
         if (!in || c != ' ')
         {
-            in.setstate(std::ios::failbit);
+            in.setstate(std::ios::failbit); // если чтение не удалось, то мы ставим потоку состояние failbit и после этого выражение типа (!in) будут работать
             return false;
         }
 
@@ -30,7 +30,7 @@ namespace
         return true;
     }
 
-    bool readTokenUntilColon(std::istream& in, std::string& token)
+    bool readTokenUntilColon(std::istream& in, std::string& token) // читает текст до двоеточия
     {
         token.clear();
 
@@ -50,7 +50,7 @@ namespace
         return true;
     }
 
-    bool hasWhitespace(const std::string& str)
+    bool hasWhitespace(const std::string& str) // есть ли внутри строки пробельный символ
     {
         for (char c : str)
         {
@@ -63,7 +63,7 @@ namespace
         return false;
     }
 
-    bool isDblSciToken(const std::string& token)
+    bool isDblSciToken(const std::string& token) // строка DBL SCI?
     {
         if (token.empty() || hasWhitespace(token))
         {
@@ -95,7 +95,7 @@ namespace
 
         ++pos;
 
-        std::size_t digitsAfterDot = pos;
+        std::size_t digitsAfterDot = pos; // проверка цифр до точки в след строке
         while (pos < token.size() && std::isdigit(static_cast<unsigned char>(token[pos])))
         {
             ++pos;
@@ -356,20 +356,5 @@ std::string formatUllBin(unsigned long long value)
     std::reverse(result.begin(), result.end());
 
     return "0b" + result;
-}
-
-iofguard::iofguard(std::basic_ios<char>& s):
-    s_(s),
-    fill_(s.fill()),
-    precision_(s.precision()),
-    fmt_(s.flags())
-{
-}
-
-iofguard::~iofguard()
-{
-    s_.fill(fill_);
-    s_.precision(precision_);
-    s_.flags(fmt_);
 }
 
