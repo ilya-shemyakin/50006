@@ -6,7 +6,6 @@
 #include <sstream>
 #include <iomanip>
 #include <cctype>
-#include <optional>
 #include <cmath>
 
 struct DataStruct {
@@ -68,16 +67,16 @@ static bool parseQuotedString(const std::string& token, std::string& value) {
     return true;
 }
 
-static std::optional<DataStruct> parseRecord(const std::string& line) {
+static bool parseRecord(const std::string& line, DataStruct& out) {
     std::string s = line;
     trim(s);
     if (s.empty() || s.front() != '(' || s.back() != ')')
-        return std::nullopt;
+        return false;
 
     std::string content = s.substr(1, s.size() - 2);
     trim(content);
     if (content.empty())
-        return std::nullopt;
+        return false;
 
     std::vector<std::string> tokens;
     std::string cur;
@@ -106,7 +105,7 @@ static std::optional<DataStruct> parseRecord(const std::string& line) {
     for (const auto& token : tokens) {
         size_t spacePos = token.find(' ');
         if (spacePos == std::string::npos)
-            return std::nullopt;
+            return false;
         std::string key = token.substr(0, spacePos);
         std::string val = token.substr(spacePos + 1);
         trim(key);
@@ -114,25 +113,26 @@ static std::optional<DataStruct> parseRecord(const std::string& line) {
 
         if (key == "key1") {
             if (hasKey1 || !parseDoubleLit(val, k1))
-                return std::nullopt;
+                return false;
             hasKey1 = true;
         } else if (key == "key2") {
             if (hasKey2 || !parseLongLongLit(val, k2))
-                return std::nullopt;
+                return false;
             hasKey2 = true;
         } else if (key == "key3") {
             if (hasKey3 || !parseQuotedString(val, k3))
-                return std::nullopt;
+                return false;
             hasKey3 = true;
         } else {
-            return std::nullopt;
+            return false;
         }
     }
 
     if (!hasKey1 || !hasKey2 || !hasKey3)
-        return std::nullopt;
+        return false;
 
-    return DataStruct{k1, k2, k3};
+    out = DataStruct{k1, k2, k3};
+    return true;
 }
 
 static std::string readBalancedRecord(std::istream& in) {
@@ -172,9 +172,9 @@ std::istream& operator>>(std::istream& in, DataStruct& dest) {
             in.setstate(std::ios::failbit);
             return in;
         }
-        auto opt = parseRecord(record);
-        if (opt) {
-            dest = *opt;
+        DataStruct tmp;
+        if (parseRecord(record, tmp)) {
+            dest = tmp;
             return in;
         }
     }
@@ -197,15 +197,11 @@ bool compare(const DataStruct& a, const DataStruct& b) {
 
 int main() {
     std::vector<DataStruct> data;
-
     std::copy(std::istream_iterator<DataStruct>(std::cin),
               std::istream_iterator<DataStruct>(),
               std::back_inserter(data));
-
     std::sort(data.begin(), data.end(), compare);
-
     std::copy(data.begin(), data.end(),
               std::ostream_iterator<DataStruct>(std::cout, "\n"));
-
     return 0;
 }
