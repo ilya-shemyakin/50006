@@ -1,5 +1,5 @@
-#include "DataStruct.h"
-#include "IOFormat.h"
+#include "DataStruct.hpp"
+#include "IOFormat.hpp"
 
 #include <iomanip>
 #include <istream>
@@ -29,12 +29,12 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         return in;
     }
 
-    DataStruct temp{}; // временный объект на случай если строка оказалась неправильной
-    bool hasKey1 = false; // проверка что на входе есть все 3 поля
+    DataStruct temp{}; 
+    bool hasKey1 = false; 
     bool hasKey2 = false;
     bool hasKey3 = false;
 
-    in >> DelimeterIO{ '(' }; // сначала открывающая скобка
+    in >> DelimeterIO{ '(' }; 
     if (!in)
     {
         return in;
@@ -42,7 +42,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
 
     while (!(hasKey1 && hasKey2 && hasKey3))
     {
-        in >> DelimeterIO{ ':' }; // потом поиск разделителя
+        in >> DelimeterIO{ ':' }; 
         if (!in)
         {
             return in;
@@ -55,14 +55,14 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
             return in;
         }
 
-        if (label == "key1" && !hasKey1) // если key1 и раньше его не было
+        if (label == "key1" && !hasKey1) 
         {
-            in >> DblSciIO{ temp.key1 }; // читаем значение
+            in >> DblSciIO{ temp.key1 }; 
             if (!in)
             {
                 return in;
             }
-            hasKey1 = true; // ставим флаг
+            hasKey1 = true; 
         }
         else if (label == "key2" && !hasKey2)
         {
@@ -84,7 +84,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         }
         else
         {
-            in.setstate(std::ios::failbit); // если поле неизвестное, то запись неправильная
+            in.setstate(std::ios::failbit); 
             return in;
         }
     }
@@ -95,7 +95,7 @@ std::istream& operator>>(std::istream& in, DataStruct& dataStruct)
         return in;
     }
 
-    in >> DelimeterIO{ ')' }; // чтение финальных символов
+    in >> DelimeterIO{ ')' }; 
     if (!in)
     {
         return in;

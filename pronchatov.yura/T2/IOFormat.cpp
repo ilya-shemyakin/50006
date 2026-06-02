@@ -1,4 +1,4 @@
-#include "IOFormat.h"
+#include "IOFormat.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -8,16 +8,16 @@
 #include <stdexcept>
 #include <string>
 
-namespace // всё, что находится внутри namespace видно только внутри этого cpp файла
+namespace 
 {
-    bool readOneSpace(std::istream& in) // проверяет что есть именно один пробел в потоке
+    bool readOneSpace(std::istream& in) 
     {
         char c = '\0';
-        in.get(c); // читаем один символ из потока
+        in.get(c); 
 
         if (!in || c != ' ')
         {
-            in.setstate(std::ios::failbit); // если чтение не удалось, то мы ставим потоку состояние failbit и после этого выражение типа (!in) будут работать
+            in.setstate(std::ios::failbit); 
             return false;
         }
 
@@ -30,7 +30,7 @@ namespace // всё, что находится внутри namespace видно
         return true;
     }
 
-    bool readTokenUntilColon(std::istream& in, std::string& token) // читает текст до двоеточия
+    bool readTokenUntilColon(std::istream& in, std::string& token) 
     {
         token.clear();
 
@@ -50,7 +50,7 @@ namespace // всё, что находится внутри namespace видно
         return true;
     }
 
-    bool hasWhitespace(const std::string& str) // есть ли внутри строки пробельный символ
+    bool hasWhitespace(const std::string& str) 
     {
         for (char c : str)
         {
@@ -63,7 +63,7 @@ namespace // всё, что находится внутри namespace видно
         return false;
     }
 
-    bool isDblSciToken(const std::string& token) // строка DBL SCI?
+    bool isDblSciToken(const std::string& token) 
     {
         if (token.empty() || hasWhitespace(token))
         {
@@ -95,7 +95,7 @@ namespace // всё, что находится внутри namespace видно
 
         ++pos;
 
-        std::size_t digitsAfterDot = pos; // проверка цифр до точки в след строке
+        std::size_t digitsAfterDot = pos; 
         while (pos < token.size() && std::isdigit(static_cast<unsigned char>(token[pos])))
         {
             ++pos;
@@ -357,4 +357,3 @@ std::string formatUllBin(unsigned long long value)
 
     return "0b" + result;
 }
-

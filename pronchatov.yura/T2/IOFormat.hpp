@@ -1,25 +1,25 @@
-#ifndef IOFORMAT_H
-#define IOFORMAT_H
+#ifndef IOFORMAT_HPP
+#define IOFORMAT_HPP
 
 #include <ios>
 #include <string>
 
-struct DelimeterIO // разделитель
+struct DelimeterIO 
 {
     char exp;
 };
 
-struct DblSciIO // для чтения DBL SCI
+struct DblSciIO 
 {
     double& ref;
 };
 
-struct UllBinIO // для чтения ULL BIN (binary)
+struct UllBinIO 
 {
     unsigned long long& ref;
 };
 
-struct StringIO // для чтения строки
+struct StringIO 
 {
     std::string& ref;
 };

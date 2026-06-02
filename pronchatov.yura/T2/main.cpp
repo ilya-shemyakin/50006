@@ -1,4 +1,4 @@
-#include "DataStruct.h"
+#include "DataStruct.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -11,18 +11,18 @@ int main()
 {
     std::vector<DataStruct> data;
 
-    while (!std::cin.eof()) // цикл что бы поток в случае плохой строки очистился и строка пропустилась
+    while (!std::cin.eof()) 
     {
         std::copy(
-            std::istream_iterator<DataStruct>(std::cin), // оператор, который читает DataStruct из std::cin
-            std::istream_iterator<DataStruct>(), // до куда мы идём, идём до конца ввода
-            std::back_inserter(data) // куда копируем, в data. back_inserter нужен потому что data пустой и data.begin() указывает на data.end()
+            std::istream_iterator<DataStruct>(std::cin), 
+            std::istream_iterator<DataStruct>(), 
+            std::back_inserter(data) 
         );
 
-        if (!std::cin.eof() && std::cin.fail()) // в случае неудачи пропускаем строку
+        if (!std::cin.eof() && std::cin.fail()) 
         {
             std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // пропускает остаток плохой строки до конца строки
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
         }
     }
 
