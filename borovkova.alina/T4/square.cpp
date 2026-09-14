@@ -62,4 +62,4 @@ Point Square::getBottomLeft() const
 double Square::getSide() const
 {
     return side_;
-}   
+}
