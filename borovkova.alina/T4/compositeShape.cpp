@@ -5,7 +5,9 @@
 #include "rectangle.h"
 #include "square.h"
 
-void CompositeShape::addShape(std::unique_ptr<Shape> shape)
+void CompositeShape::addShape(
+    std::unique_ptr<Shape> shape
+)
 {
     if (!shape)
     {
@@ -14,7 +16,9 @@ void CompositeShape::addShape(std::unique_ptr<Shape> shape)
 
     if (dynamic_cast<CompositeShape*>(shape.get()))
     {
-        throw std::invalid_argument("Nested composite forbidden");
+        throw std::invalid_argument(
+            "Composite cannot contain another composite"
+        );
     }
 
     shapes_.push_back(std::move(shape));
@@ -22,81 +26,112 @@ void CompositeShape::addShape(std::unique_ptr<Shape> shape)
 
 double CompositeShape::getArea() const
 {
-    double sum = 0.0;
+    double area = 0.0;
 
-    for (const auto& s : shapes_)
+    for (const auto& shape : shapes_)
     {
-        sum += s->getArea();
+        area += shape->getArea();
     }
 
-    return sum;
+    return area;
 }
 
 Point CompositeShape::getCenter() const
 {
     if (shapes_.empty())
     {
-        throw std::logic_error("Empty composite");
+        throw std::logic_error("Composite shape is empty");
     }
 
     bool first = true;
-    double minX, maxX, minY, maxY;
 
-    for (const auto& s : shapes_)
+    double minX = 0.0;
+    double maxX = 0.0;
+    double minY = 0.0;
+    double maxY = 0.0;
+
+    for (const auto& shape : shapes_)
     {
-        if (const Rectangle* r = dynamic_cast<const Rectangle*>(s.get()))
-        {
-            Point bl = r->getBottomLeft();
-            Point tr = r->getTopRight();
+        double left;
+        double right;
+        double bottom;
+        double top;
 
-            if (first)
-            {
-                minX = bl.x; maxX = tr.x;
-                minY = bl.y; maxY = tr.y;
-                first = false;
-            }
-            else
-            {
-                if (bl.x < minX) minX = bl.x;
-                if (tr.x > maxX) maxX = tr.x;
-                if (bl.y < minY) minY = bl.y;
-                if (tr.y > maxY) maxY = tr.y;
-            }
+        if (const Rectangle* rectangle =
+            dynamic_cast<const Rectangle*>(shape.get()))
+        {
+            Point bottomLeft =
+                rectangle->getBottomLeft();
+
+            Point topRight =
+                rectangle->getTopRight();
+
+            left = bottomLeft.x;
+            right = topRight.x;
+
+            bottom = bottomLeft.y;
+            top = topRight.y;
         }
-        else if (const Square* sq = dynamic_cast<const Square*>(s.get()))
+        else if (const Square* square =
+            dynamic_cast<const Square*>(shape.get()))
         {
-            Point c = sq->getCenter();
-            double h = sq->getSide() / 2.0;
+            Point bottomLeft =
+                square->getBottomLeft();
 
-            double left = c.x - h;
-            double right = c.x + h;
-            double bottom = c.y - h;
-            double top = c.y + h;
+            double side =
+                square->getSide();
 
-            if (first)
-            {
-                minX = left; maxX = right;
-                minY = bottom; maxY = top;
-                first = false;
-            }
-            else
-            {
-                if (left < minX) minX = left;
-                if (right > maxX) maxX = right;
-                if (bottom < minY) minY = bottom;
-                if (top > maxY) maxY = top;
-            }
+            left = bottomLeft.x;
+            right = bottomLeft.x + side;
+
+            bottom = bottomLeft.y;
+            top = bottomLeft.y + side;
+        }
+        else
+        {
+            continue;
+        }
+
+        if (first)
+        {
+            minX = left;
+            maxX = right;
+
+            minY = bottom;
+            maxY = top;
+
+            first = false;
+        }
+        else
+        {
+            if (left < minX)
+                minX = left;
+
+            if (right > maxX)
+                maxX = right;
+
+            if (bottom < minY)
+                minY = bottom;
+
+            if (top > maxY)
+                maxY = top;
         }
     }
 
-    return { (minX + maxX) / 2.0, (minY + maxY) / 2.0 };
+    return {
+        (minX + maxX) / 2.0,
+        (minY + maxY) / 2.0
+    };
 }
 
-void CompositeShape::move(double dx, double dy)
+void CompositeShape::move(
+    double dx,
+    double dy
+)
 {
-    for (auto& s : shapes_)
+    for (auto& shape : shapes_)
     {
-        s->move(dx, dy);
+        shape->move(dx, dy);
     }
 }
 
@@ -104,20 +139,32 @@ void CompositeShape::scale(double factor)
 {
     if (factor <= 0.0)
     {
-        throw std::invalid_argument("Invalid scale");
+        throw std::invalid_argument(
+            "Invalid scale factor"
+        );
     }
 
-    Point c = getCenter();
+    Point center = getCenter();
 
-    for (auto& s : shapes_)
+    for (auto& shape : shapes_)
     {
-        Point sc = s->getCenter();
+        Point shapeCenter =
+            shape->getCenter();
 
-        double dx = (sc.x - c.x) * (factor - 1.0);
-        double dy = (sc.y - c.y) * (factor - 1.0);
+        double newCenterX =
+            center.x +
+            (shapeCenter.x - center.x) * factor;
 
-        s->move(dx, dy);
-        s->scale(factor);
+        double newCenterY =
+            center.y +
+            (shapeCenter.y - center.y) * factor;
+
+        shape->move(
+            newCenterX - shapeCenter.x,
+            newCenterY - shapeCenter.y
+        );
+
+        shape->scale(factor);
     }
 }
 
