@@ -1,19 +1,20 @@
-#ifndef DATASTRUCT_HPP
-#define DATASTRUCT_HPP
+#ifndef DATA_STRUCT_HPP
+#define DATA_STRUCT_HPP
 
-#include <iostream>
 #include <string>
+#include <iostream>
 
-struct DataStruct
-{
+struct DataStruct {
     double key1;
     unsigned long long key2;
     std::string key3;
 };
 
-bool compareDataStruct(const DataStruct& lhs, const DataStruct& rhs);
+struct DataStructComparator {
+    bool operator()(const DataStruct& left, const DataStruct& right) const;
+};
 
-std::istream& operator>>(std::istream& in, DataStruct& dest);
-std::ostream& operator<<(std::ostream& out, const DataStruct& src);
+std::istream& operator>>(std::istream& in, DataStruct& data);
+std::ostream& operator<<(std::ostream& out, const DataStruct& data);
 
 #endif

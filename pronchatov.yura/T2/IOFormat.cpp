@@ -1,359 +1,211 @@
 #include "IOFormat.hpp"
-
-#include <algorithm>
-#include <cctype>
-#include <iomanip>
-#include <limits>
-#include <sstream>
-#include <stdexcept>
+#include <istream>
+#include <cctype> //std::isdigit
+#include <sstream> //std::istringstream
 #include <string>
+#include <limits>
 
-namespace
-{
-    bool readOneSpace(std::istream& in)
-    {
-        char c = '\0';
-        in.get(c);
+bool readTokenUntilColon(std::istream& in, std::string& token) {
+    token.clear();
 
-        if (!in || c != ' ')
-        {
-            in.setstate(std::ios::failbit);
-            return false;
-        }
-
-        if (in.peek() == ' ')
-        {
-            in.setstate(std::ios::failbit);
-            return false;
-        }
-
-        return true;
+    while (in && in.peek() != ':') {
+        char current = '\0';
+        in.get(current);
+        token.push_back(current);
     }
+    if (!in) { return false; }
+    return true;
+}
 
-    bool readTokenUntilColon(std::istream& in, std::string& token)
-    {
-        token.clear();
-
-        while (in && in.peek() != std::char_traits<char>::eof() && in.peek() != ':')
-        {
-            char c = '\0';
-            in.get(c);
-            token += c;
-        }
-
-        if (!in || in.peek() == std::char_traits<char>::eof() || token.empty())
-        {
-            in.setstate(std::ios::failbit);
-            return false;
-        }
-
-        return true;
-    }
-
-    bool hasWhitespace(const std::string& str)
-    {
-        for (char c : str)
-        {
-            if (std::isspace(static_cast<unsigned char>(c)))
-            {
-                return true;
-            }
-        }
-
+bool readDigits(std::string::const_iterator& current, const std::string::const_iterator& end) {
+    if (current == end || !std::isdigit(static_cast<unsigned char>(*current))) {
         return false;
     }
 
-    bool isDblSciToken(const std::string& token)
-    {
-        if (token.empty() || hasWhitespace(token))
-        {
-            return false;
-        }
-
-        std::size_t pos = 0;
-
-        if (token[pos] == '+' || token[pos] == '-')
-        {
-            ++pos;
-        }
-
-        std::size_t digitsBeforeDot = pos;
-        while (pos < token.size() && std::isdigit(static_cast<unsigned char>(token[pos])))
-        {
-            ++pos;
-        }
-
-        if (digitsBeforeDot == pos)
-        {
-            return false;
-        }
-
-        if (pos >= token.size() || token[pos] != '.')
-        {
-            return false;
-        }
-
-        ++pos;
-
-        std::size_t digitsAfterDot = pos;
-        while (pos < token.size() && std::isdigit(static_cast<unsigned char>(token[pos])))
-        {
-            ++pos;
-        }
-
-        if (digitsAfterDot == pos)
-        {
-            return false;
-        }
-
-        if (pos >= token.size() || (token[pos] != 'e' && token[pos] != 'E'))
-        {
-            return false;
-        }
-
-        ++pos;
-
-        if (pos < token.size() && (token[pos] == '+' || token[pos] == '-'))
-        {
-            ++pos;
-        }
-
-        std::size_t exponentStart = pos;
-        while (pos < token.size() && std::isdigit(static_cast<unsigned char>(token[pos])))
-        {
-            ++pos;
-        }
-
-        return exponentStart != pos && pos == token.size();
+    while (current != end && std::isdigit(static_cast<unsigned char>(*current))) {
+        ++current;
     }
 
-    bool parseUllBinToken(const std::string& token, unsigned long long& value)
-    {
-        if (token.size() < 3)
-        {
-            return false;
-        }
-
-        if (token[0] != '0' || (token[1] != 'b' && token[1] != 'B'))
-        {
-            return false;
-        }
-
-        unsigned long long result = 0;
-        const unsigned long long maxValue = std::numeric_limits<unsigned long long>::max();
-
-        for (std::size_t i = 2; i < token.size(); ++i)
-        {
-            if (token[i] != '0' && token[i] != '1')
-            {
-                return false;
-            }
-
-            unsigned long long bit = static_cast<unsigned long long>(token[i] - '0');
-
-            if (result > (maxValue - bit) / 2)
-            {
-                return false;
-            }
-
-            result = result * 2 + bit;
-        }
-
-        value = result;
-        return true;
-    }
+    return true;
 }
 
-std::istream& operator>>(std::istream& in, DelimeterIO&& dest)
-{
-    std::istream::sentry sentry(in);
-    if (!sentry)
-    {
-        return in;
+bool isDblSci(const std::string& token) {
+    std::string::const_iterator current = token.cbegin();
+    const std::string::const_iterator end = token.cend();
+
+    if (current != end && (*current == '+' || *current == '-')) {
+        ++current;
     }
 
-    char c = '\0';
-    in >> c;
-
-    if (in && c != dest.exp)
-    {
-        in.setstate(std::ios::failbit);
-        return in;
+    if (!readDigits(current, end)) {
+        return false;
     }
 
-    if (in.peek() == ' ')
-    {
+    if (current == end || *current != '.') {
+        return false;
+    }
+
+    ++current;
+
+    if (!readDigits(current, end)) {
+        return false;
+    }
+
+    if (current == end || (*current != 'e' && *current != 'E')) {
+        return false;
+    }
+
+    ++current;
+
+    if (current != end && (*current == '+' || *current == '-')) {
+        ++current;
+    }
+
+    if (!readDigits(current, end)) {
+        return false;
+    }
+
+    return current == end;
+}
+
+bool isUllBin(const std::string& token) {
+    std::string::const_iterator current = token.cbegin();
+    const std::string::const_iterator end = token.cend();
+
+    if (current == end || *current != '0') {
+        return false;
+    }
+
+    ++current;
+
+    if (current == end || (*current != 'b' && *current != 'B')) {
+        return false;
+    }
+
+    ++current;
+
+    if (current == end) {
+        return false;
+    }
+
+    while (current != end) {
+        if (*current != '0' && *current != '1') {
+            return false;
+        }
+        ++current;
+    }
+
+    return true;
+}
+
+bool convertUllBin (const std::string& token, unsigned long long& result) {
+    std::string::const_iterator current = token.cbegin();
+    const std::string::const_iterator end = token.cend();
+    const unsigned long long maxValue = std::numeric_limits<unsigned long long>::max();
+
+    if (!isUllBin(token)) {
+        return false;
+    }
+
+    unsigned long long tempResult{};
+
+    ++current;
+    ++current;
+
+    while (current != end) {
+        const unsigned long long bit = static_cast<unsigned long long>(*current - '0');
+
+        if (tempResult > (maxValue - bit) / 2) {
+            return false;
+        }
+
+        tempResult = tempResult * 2 + bit;
+        ++current;
+    }
+
+    result = tempResult;
+    return true;
+}
+
+std::istream& operator>>(std::istream& in, DelimiterIO delimiter) {
+    char current = '\0';
+    in.get(current);
+
+    if (!in) { return in; }
+    if (current != delimiter.expectedChar) {
         in.setstate(std::ios::failbit);
+        return in;
     }
 
     return in;
 }
 
-std::istream& operator>>(std::istream& in, DblSciIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
 
-    if (!readOneSpace(in))
-    {
-        return in;
-    }
+std::istream& operator>>(std::istream& in, DblSciIO dest) {
 
     std::string token;
-    if (!readTokenUntilColon(in, token))
-    {
-        return in;
-    }
+    double parsedValue{};
 
-    if (!isDblSciToken(token))
-    {
+    if (!readTokenUntilColon(in, token)){
         in.setstate(std::ios::failbit);
         return in;
     }
 
-    try
-    {
-        std::size_t parsedChars = 0;
-        double value = std::stod(token, &parsedChars);
-
-        if (parsedChars != token.size())
-        {
-            in.setstate(std::ios::failbit);
-            return in;
-        }
-
-        dest.ref = value;
-    }
-    catch (const std::exception&)
-    {
+    if (!isDblSci(token)) {
         in.setstate(std::ios::failbit);
+        return in;
     }
 
+    std::istringstream parser(token);
+    parser >> parsedValue;
+
+    if (!parser) {
+        in.setstate(std::ios::failbit);
+        return in;
+    }
+
+    dest.value = parsedValue;
     return in;
 }
 
-std::istream& operator>>(std::istream& in, UllBinIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    if (!readOneSpace(in))
-    {
-        return in;
-    }
-
+std::istream& operator>>(std::istream& in, UllBinIO dest) {
     std::string token;
-    if (!readTokenUntilColon(in, token))
-    {
-        return in;
-    }
+    unsigned long long parsedValue{};
 
-    unsigned long long value = 0;
-    if (!parseUllBinToken(token, value))
-    {
+    if (!readTokenUntilColon(in, token)) {
         in.setstate(std::ios::failbit);
         return in;
     }
 
-    dest.ref = value;
-    return in;
-}
 
-std::istream& operator>>(std::istream& in, StringIO&& dest)
-{
-    std::istream::sentry sentry(in, true);
-    if (!sentry)
-    {
-        return in;
-    }
-
-    if (!readOneSpace(in))
-    {
-        return in;
-    }
-
-    in >> std::quoted(dest.ref);
-
-    if (!in)
-    {
-        return in;
-    }
-
-    if (in.peek() == ' ')
-    {
+    if (!convertUllBin(token, parsedValue)) {
         in.setstate(std::ios::failbit);
+        return in;
     }
 
+    dest.value = parsedValue;
     return in;
 }
 
-std::string formatDblSci(double value)
-{
-    std::ostringstream out;
-    out << std::scientific << std::setprecision(1) << value;
+std::istream& operator>>(std::istream& in, StringIO dest) {
 
-    std::string result = out.str();
+    std::string parsedString;
 
-    std::size_t expPos = result.find('e');
-    if (expPos == std::string::npos)
-    {
-        expPos = result.find('E');
+    in >> DelimiterIO{'"'};
+    if (!in) {
+        return in;
     }
 
-    if (expPos == std::string::npos)
-    {
-        return result;
+    std::getline(in, parsedString, '"');
+    if (in.eof()) {
+        in.setstate(std::ios::failbit);
+        return in;
     }
 
-    std::string mantissa = result.substr(0, expPos);
-    std::string exponent = result.substr(expPos + 1);
-
-    char sign = '+';
-    std::size_t digitStart = 0;
-
-    if (!exponent.empty() && (exponent[0] == '+' || exponent[0] == '-'))
-    {
-        sign = exponent[0];
-        digitStart = 1;
+    if (!in) {
+        return in;
     }
 
-    std::string digits = exponent.substr(digitStart);
-
-    while (digits.size() > 1 && digits[0] == '0')
-    {
-        digits.erase(digits.begin());
-    }
-
-    if (digits.empty())
-    {
-        digits = "0";
-    }
-
-    return mantissa + "e" + sign + digits;
-}
-
-std::string formatUllBin(unsigned long long value)
-{
-    if (value == 0)
-    {
-        return "0b0";
-    }
-
-    std::string result;
-
-    while (value > 0)
-    {
-        result += static_cast<char>('0' + value % 2);
-        value /= 2;
-    }
-
-    std::reverse(result.begin(), result.end());
-
-    return "0b" + result;
+    dest.string = parsedString;
+    return in;
 }

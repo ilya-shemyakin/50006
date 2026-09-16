@@ -1,36 +1,30 @@
 #ifndef IOFORMAT_HPP
 #define IOFORMAT_HPP
 
-#include <ios>
+#include "DataStruct.hpp"
 #include <string>
+#include <istream>
 
-struct DelimeterIO
-{
-    char exp;
+struct DelimiterIO {
+    char expectedChar;
 };
 
-struct DblSciIO
-{
-    double& ref;
+struct DblSciIO {
+    double& value;
 };
 
-struct UllBinIO
-{
-    unsigned long long& ref;
+struct UllBinIO {
+    unsigned long long& value;
 };
 
-struct StringIO
-{
-    std::string& ref;
+struct StringIO {
+    std::string& string;
 };
 
-std::istream& operator>>(std::istream& in, DelimeterIO&& dest);
-std::istream& operator>>(std::istream& in, DblSciIO&& dest);
-std::istream& operator>>(std::istream& in, UllBinIO&& dest);
-std::istream& operator>>(std::istream& in, StringIO&& dest);
-
-std::string formatDblSci(double value);
-std::string formatUllBin(unsigned long long value);
+std::istream& operator>>(std::istream& in, DelimiterIO delimiter);
+std::istream& operator>>(std::istream& in, DblSciIO dest);
+std::istream& operator>>(std::istream& in, UllBinIO dest);
+std::istream& operator>>(std::istream& in, StringIO dest);
 
 
 #endif
