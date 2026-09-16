@@ -33,17 +33,22 @@ double calculateArea(const Polygon& polygon) {
         constBegin + 1,
         contributions.begin(),
         [](const Point& firstPoint, const Point& secondPoint) {
-            return static_cast<double>(firstPoint.x) * secondPoint.y - static_cast<double>(secondPoint.x) * firstPoint.y;
+            return static_cast<double>(firstPoint.x) * secondPoint.y -
+                static_cast<double>(secondPoint.x) * firstPoint.y;
         }
     );
 
-    double firstLastPointsContribution = static_cast<double>((constEnd - 1)->x) * constBegin->y - static_cast<double>((constEnd - 1)->y) * constBegin->x;
+    double firstLastPointsContribution =
+        static_cast<double>((constEnd - 1)->x) * constBegin->y -
+        static_cast<double>((constEnd - 1)->y) * constBegin->x;
 
-    double sumOfContributions = std::accumulate(contributions.cbegin(), contributions.cend(), 0.0) + firstLastPointsContribution;
-    
+    double sumOfContributions =
+        std::accumulate(contributions.cbegin(), contributions.cend(), 0.0) +
+        firstLastPointsContribution;
+
     calculatedArea = std::abs(sumOfContributions) / 2.0;
-    
-    return calculatedArea;  
+
+    return calculatedArea;
 }
 
 
@@ -62,7 +67,10 @@ double calculateSumAreaIf(const std::vector<Polygon>& polygons, Predicate predic
     );
 }
 
-double calculateAreaByNumberOfVertices(const std::vector<Polygon>& polygons, std::size_t numberOfVertexes) {
+double calculateAreaByNumberOfVertices(
+    const std::vector<Polygon>& polygons,
+    std::size_t numberOfVertexes
+) {
     return calculateSumAreaIf(
         polygons,
         [numberOfVertexes](const Polygon& polygon) {
@@ -105,7 +113,10 @@ double calculateAreaMean(const std::vector<Polygon>& polygons) {
 }
 
 template <typename Comparator>
-std::vector<Polygon>::const_iterator findMaxPolygon(const std::vector<Polygon>& polygons, Comparator comparator) {
+std::vector<Polygon>::const_iterator findMaxPolygon(
+    const std::vector<Polygon>& polygons,
+    Comparator comparator
+) {
     if (polygons.empty()) {
         throw std::invalid_argument("No polygons to search for maximum element");
     }
@@ -118,7 +129,10 @@ std::vector<Polygon>::const_iterator findMaxPolygon(const std::vector<Polygon>& 
 }
 
 template <typename Comparator>
-std::vector<Polygon>::const_iterator findMinPolygon(const std::vector<Polygon>& polygons, Comparator comparator) {
+std::vector<Polygon>::const_iterator findMinPolygon(
+    const std::vector<Polygon>& polygons,
+    Comparator comparator
+) {
     if (polygons.empty()) {
         throw std::invalid_argument("No polygons to search for minimum element");
     }
@@ -196,12 +210,15 @@ std::size_t countOdd(const std::vector<Polygon>& polygons) {
     return countIf(
         polygons,
         [](const Polygon& polygon) {
-            return (polygon.points.size() % 2) != 0; 
+            return (polygon.points.size() % 2) != 0;
         }
     );
 }
 
-std::size_t countByNumberOfVertices(const std::vector<Polygon>& polygons, std::size_t sizeExpected) {
+std::size_t countByNumberOfVertices(
+    const std::vector<Polygon>& polygons,
+    std::size_t sizeExpected
+) {
     return countIf(
         polygons,
         [sizeExpected](const Polygon& polygon) {
@@ -224,7 +241,7 @@ bool isPermutation(const Polygon& first, const Polygon& second) {
         second.points.cend(),
         [](const Point& first, const Point& second) {
             return (first.x == second.x && first.y == second.y);
-        } 
+        }
     );
 }
 

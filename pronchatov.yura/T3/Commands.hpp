@@ -7,7 +7,10 @@
 #include <vector>
 
 double calculateArea(const Polygon& polygon);
-double calculateAreaByNumberOfVertices(const std::vector<Polygon>& polygons, std::size_t numberOfVertexes);
+double calculateAreaByNumberOfVertices(
+    const std::vector<Polygon>& polygons,
+    std::size_t numberOfVertexes
+);
 double calculateAreaEven(const std::vector<Polygon>& polygons);
 double calculateAreaOdd(const std::vector<Polygon>& polygons);
 double calculateAreaMean(const std::vector<Polygon>& polygons);

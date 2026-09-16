@@ -42,7 +42,7 @@ namespace {
         if (!(isEndOfCommand(commandStream))) {
             return false;
         }
-        
+
         if (argument == "EVEN") {
             std::cout << calculateAreaEven(polygons) << '\n';
             return true;
@@ -59,7 +59,7 @@ namespace {
             std::size_t vertexCount;
             if (parseVertexCount(argument, vertexCount)) {
                 std::cout << calculateAreaByNumberOfVertices(polygons, vertexCount) << '\n';
-                return true;            
+                return true;
             }
             return false;
         }
@@ -126,7 +126,7 @@ namespace {
             std::cout << countOdd(polygons) << '\n';
             return true;
         }
-        
+
         std::size_t vertexCount;
         if (!parseVertexCount(argument, vertexCount)) {
             return false;
@@ -145,7 +145,7 @@ namespace {
         if (!isEndOfCommand(commandStream)) {
             return false;
         }
-        return true; 
+        return true;
     }
 
     bool processPerms(std::istringstream& commandStream, const std::vector<Polygon>& polygons) {
@@ -155,7 +155,7 @@ namespace {
             return false;
         }
         std::cout << countPermutations(polygons, targetPolygon) << '\n';
-        
+
         return true;
     }
 

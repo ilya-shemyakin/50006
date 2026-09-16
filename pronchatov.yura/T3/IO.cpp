@@ -10,7 +10,7 @@ std::vector<Polygon> readPolygonsFromFile(const std::string& filename) {
     if (!file.is_open()) {
         throw std::runtime_error("Could not find the specified file");
     }
-    
+
     std::vector<Polygon> resultPolygonsVector;
     std::string onePolygonLine;
 
@@ -20,7 +20,7 @@ std::vector<Polygon> readPolygonsFromFile(const std::string& filename) {
         }
 
         std::istringstream onePolygonStream(onePolygonLine);
-        
+
         Polygon polygon{};
         onePolygonStream >> polygon;
         if (!onePolygonStream) {

@@ -45,10 +45,10 @@ std::istream& operator>>(std::istream& in, Polygon& polygon) {
     if (!guard) {
         return in;
     }
-    
+
     Polygon tempPolygon;
     int numberOfPoints{};
-    
+
     if (!checkNoWhitespaceEof(in)) {
         return in;
     }
@@ -74,7 +74,7 @@ std::istream& operator>>(std::istream& in, Polygon& polygon) {
         }
 
         if (separator != ' ') {
-            in.setstate(std::ios::failbit); 
+            in.setstate(std::ios::failbit);
             return in;
         }
 
@@ -93,7 +93,7 @@ std::istream& operator>>(std::istream& in, Polygon& polygon) {
 }
 
 std::istream& operator>>(std::istream& in, Point& point) {
-    
+
     std::istream::sentry guard(in, true);
 
     if (!guard) {
@@ -110,7 +110,7 @@ std::istream& operator>>(std::istream& in, Point& point) {
     if (!checkNoWhitespaceEof(in)) {
         return in;
     }
-    
+
     in >> tempX;
     if (!in) {
         return in;
@@ -132,7 +132,7 @@ std::istream& operator>>(std::istream& in, Point& point) {
     if (!readExpectedChar(in, ')')) {
         return in;
     }
-    
+
     point = Point{tempX, tempY};
     return in;
 
