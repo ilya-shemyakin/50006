@@ -47,6 +47,29 @@ namespace {
         return result;
     }
 
+    std::string formatDouble(double value) {
+        std::ostringstream ss;
+
+        ss << std::scientific
+        << std::setprecision(1)
+        << std::nouppercase
+        << value;
+
+        std::string result = ss.str();
+
+        std::size_t i = 0;
+
+        while (i < result.size() && result[i] != 'e') {
+            ++i;
+        }
+
+        if (i + 2 < result.size() && result[i + 2] == '0') {
+            result.erase(i + 2, 1);
+        }
+
+        return result;
+    }
+
     bool parseDataStruct(std::istream& in, DataStruct& dest) {
         std::istream::sentry sentry(in);
 
@@ -162,8 +185,7 @@ std::ostream& operator<<(std::ostream& out, const DataStruct& data) {
     StreamGuard guard(out);
 
     out << "(:key1 "
-        << std::scientific << std::setprecision(1) << std::nouppercase
-        << data.key1
+        << formatDouble(data.key1)
         << ":key2 0b" << toBinaryString(data.key2)
         << ":key3 \"" << data.key3 << "\":)";
 
