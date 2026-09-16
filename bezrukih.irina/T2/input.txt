@@ -1,0 +1,7 @@
+(:key1 0xFFFFA:key2 #c(1.0 -1.0):key3 "Hello":)
+(:key1 0x100f:key2 #c(0.0 0.0):key3 "A":)
+(:key1 0xFFFFA:key2 #c(2.0 0.0):key3 "Longer":)
+(:key1 0x0:key2 #c(-1.0 1.0):key3 "Mid":)
+(:key1 0x100f:key2 #c(3.0 4.0):key3 "B":)
+(:key1 0xFFFFA:key2 #c(1.0 1.0):key3 "Z":)
+(:key1 0x10:key2 #c(0.5 0.5):key3 "Test":)
